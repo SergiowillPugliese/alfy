@@ -1,0 +1,19 @@
+{
+  "name": "alfy-shared-lib",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/alfy-shared-lib/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/alfy-shared-lib",
+        "main": "libs/alfy-shared-lib/src/index.ts",
+        "tsConfig": "libs/alfy-shared-lib/tsconfig.lib.json",
+        "assets": ["libs/alfy-shared-lib/*.md"]
+      }
+    }
+  }
+}

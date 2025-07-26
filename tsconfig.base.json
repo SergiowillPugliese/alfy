@@ -14,7 +14,12 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@alfy/alfy-shared-lib": ["libs/alfy-shared-lib/src/index.ts"],
+      "mfShopping/Routes": [
+        "apps/mfShopping/src/app/remote-entry/entry.routes.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,82 +1,236 @@
-# Alfy
+# 🏠 Alfy - Home Management App
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+## 🎯 Vision & Concetto
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+**Alfy** è un'applicazione mobile per la gestione completa della vita domestica e familiare. L'obiettivo è centralizzare tutte le attività quotidiane di una famiglia in un'unica app intuitiva e moderna.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+### 🎪 Il Nome
+"Alfy" deriva da "Alfred", il maggiordomo di Batman - rappresenta l'assistente digitale perfetto che si prende cura di tutti i dettagli della gestione domestica.
 
-## Finish your CI setup
+## 🌟 Funzionalità Core
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/1hk0KWvnNU)
+### 📋 **Liste della Spesa** (Implementato)
+- ✅ Creazione e gestione liste multiple
+- ✅ Aggiunta/rimozione articoli  
+- ✅ Segna come acquistato/non acquistato
+- 🔄 **TODO**: Condivisione familiare
+- 🔄 **TODO**: Prodotti preferiti e suggerimenti
+- 🔄 **TODO**: Categorizzazione automatica
+- 🔄 **TODO**: Integrazione con negozi online
 
+### 👥 **Gestione Multi-Utente & Famiglia** (Da Implementare)
+- **Profili Utente**: Ogni membro ha il suo profilo personalizzato
+- **Famiglia Condivisa**: Creazione/join di gruppi familiari
+- **Permessi Granulari**: 
+  - Contenuti personali (solo utente)
+  - Contenuti familiari (tutti i membri)
+  - Ruoli admin/membro
+- **Dashboard Personalizzate**: Vista filtrata per ogni utente
 
-## Run tasks
+### 📅 **Calendar & Appuntamenti** (Da Implementare)
+- **Appuntamenti Personali**: Medico, lavoro, hobby
+- **Eventi Familiari**: Compleanni, vacanze, riunioni scolastiche
+- **Promemoria Intelligenti**: Notifiche mirate
+- **Integrazione Calendario**: Sync con Google/Apple Calendar
+- **Recurring Events**: Gestione eventi ricorrenti
 
-To run the dev server for your app, use:
+### ⏰ **Scadenze & Reminder** (Da Implementare)
+- **Scadenze Domestiche**: Bollette, assicurazioni, controlli
+- **Scadenze Personali**: Documenti, certificazioni
+- **Smart Notifications**: 
+  - Notifiche individuali per scadenze personali
+  - Broadcast familiare per scadenze condivise
+  - Escalation se non gestite
+- **Templates**: Scadenze ricorrenti pre-impostate
 
-```sh
-npx nx serve frontend
+### 💰 **Gestione Spese** (Da Implementare)
+- **Expense Tracking**: Registrazione spese quotidiane
+- **Categorizzazione**: Casa, cibo, trasporti, svago, etc.
+- **Budget Familiari**: Limiti di spesa per categoria
+- **Split Expenses**: Divisione spese tra membri famiglia
+- **Reports & Analytics**: Grafici e trend di spesa
+- **Integrazione Bancaria**: Import automatico movimenti (futuro)
+
+### 🔔 **Sistema Notifiche Avanzato** (Da Implementare)
+- **Push Notifications**: Promemoria in tempo reale
+- **In-App Notifications**: Centro notifiche interno
+- **Email Digest**: Riassunto settimanale attività
+- **Smart Scheduling**: Notifiche basate su abitudini utente
+- **Quiet Hours**: Modalità silenziosa per fasce orarie
+
+## 🏗️ Architettura Tecnica
+
+### **Frontend (Angular/Ionic)**
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── domains/           # Entità business
+│   │   │   ├── user/
+│   │   │   ├── family/
+│   │   │   ├── shopping-list/
+│   │   │   ├── calendar/
+│   │   │   ├── expenses/
+│   │   │   └── notifications/
+│   │   └── applications/      # Use Cases
+│   │       ├── auth-use-case/
+│   │       ├── shopping-list-use-case/
+│   │       ├── calendar-use-case/
+│   │       └── expense-use-case/
+│   ├── infrastructure/        # Repository implementations
+│   │   ├── auth-repository/
+│   │   ├── shopping-repository/
+│   │   └── expense-repository/
+│   └── features/             # UI Components & Pages
+│       ├── auth/
+│       ├── dashboard/
+│       ├── shopping-list/
+│       ├── calendar/
+│       ├── expenses/
+│       └── shared/
 ```
 
-To create a production bundle:
+### **Patterns Architetturali**
+- **Clean Architecture**: Separazione domini, use case, infrastructure
+- **Angular Signals**: State management reattivo
+- **Standalone Components**: Approccio moderno Angular 19
+- **Repository Pattern**: Astrazione data access
+- **Dependency Injection**: IoC container Angular
 
-```sh
-npx nx build frontend
+### **Tech Stack**
+- **Frontend**: Angular 19, Ionic 8, Capacitor
+- **State Management**: Angular Signals + RxJS
+- **Styling**: Tailwind CSS + Ionic Components
+- **Forms**: Reactive Forms
+- **Testing**: Jest + Cypress
+- **Build**: Angular CLI + Vite
+
+## 📱 User Experience
+
+### **Navigation Flow**
+```
+🏠 Dashboard
+├── 📋 Shopping Lists
+│   ├── My Lists
+│   ├── Family Lists  
+│   └── Shared Items
+├── 📅 Calendar
+│   ├── Personal Events
+│   ├── Family Events
+│   └── Deadlines
+├── 💰 Expenses
+│   ├── Add Expense
+│   ├── Budget Overview
+│   └── Reports
+├── 🔔 Notifications
+└── ⚙️ Settings
+    ├── Profile
+    ├── Family Management
+    └── Preferences
 ```
 
-To see all available targets to run for a project, run:
+### **Key User Journeys**
 
-```sh
-npx nx show project frontend
-```
+#### **Nuovo Utente**
+1. Download app → Onboarding → Registrazione
+2. Setup profilo → Crea famiglia o join esistente
+3. Tutorial guidato → Prime configurazioni
+4. Prima lista spesa → Primo appuntamento
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+#### **Uso Quotidiano Famiglia**
+1. Check dashboard mattutina
+2. Aggiunta spese durante giornata  
+3. Update shopping list dal supermercato
+4. Review notifiche serali
+5. Planning settimanale weekend
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 🚀 Roadmap di Sviluppo
 
-## Add new projects
+### **Phase 1: Foundation (Q1 2024)**
+- [ ] Sistema autenticazione (JWT)
+- [ ] Gestione profili utente
+- [ ] Creazione/gestione famiglie
+- [ ] Guards & routing protetto
+- [ ] Refactor shopping-list per multi-user
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+### **Phase 2: Calendar & Notifications (Q2 2024)**
+- [ ] Gestione appuntamenti personali/familiari
+- [ ] Sistema scadenze con reminder
+- [ ] Push notifications (Capacitor)
+- [ ] In-app notification center
+- [ ] Integrazione calendario nativo
 
-Use the plugin's generator to create new projects.
+### **Phase 3: Expense Management (Q3 2024)**
+- [ ] Tracking spese con categorizzazione
+- [ ] Budget familiari e alerting
+- [ ] Split expenses tra membri
+- [ ] Reports e analytics avanzati
+- [ ] Export dati (PDF/Excel)
 
-To generate a new application, use:
+### **Phase 4: Advanced Features (Q4 2024)**
+- [ ] AI suggestions per shopping list
+- [ ] Geofencing per reminder location-based
+- [ ] Integrazione assistenti vocali
+- [ ] Dark mode & accessibility
+- [ ] Multi-language support
 
-```sh
-npx nx g @nx/angular:app demo
-```
+### **Phase 5: Ecosystem (2025)**
+- [ ] API pubbliche per integrazioni
+- [ ] Web app companion
+- [ ] Smart home integrations
+- [ ] Marketplace template/plugins
+- [ ] Community features
 
-To generate a new library, use:
+## 🎨 Design System
 
-```sh
-npx nx g @nx/angular:lib mylib
-```
+### **Color Palette**
+- **Primary**: `#5D9B9B` (Teal calmo e affidabile)
+- **Secondary**: `#F1C40F` (Giallo energico per azioni)
+- **Success**: `#22C55E` (Verde per conferme)
+- **Accent**: `#1ABC9C` (Azzurro per highlights)
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### **Typography**
+- **Headings**: Roboto Bold
+- **Body**: Roboto Regular  
+- **UI Elements**: Roboto Medium
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### **Component Library**
+- Basato su Ionic Design System
+- Custom components per business logic
+- Responsive design mobile-first
+- Gestures native (swipe, pull-to-refresh)
 
+## 📊 Metriche di Successo
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### **Engagement**
+- Daily Active Users (DAU)
+- Session duration media
+- Feature adoption rate
+- Retention rate (1/7/30 giorni)
 
-## Install Nx Console
+### **Business Value**
+- Tempo risparmiato per famiglia/settimana
+- Accuratezza gestione budget
+- Riduzione spese impulso
+- Stress reduction index (survey)
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+### **Technical**
+- App performance (startup time < 2s)
+- Crash rate < 0.1%
+- API response time < 500ms
+- Offline capability
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 🔮 Vision a Lungo Termine
 
-## Useful links
+**Alfy** diventerà il **"sistema operativo della famiglia moderna"** - l'unico punto di accesso per gestire tutti gli aspetti della vita domestica con intelligence artificiale che impara dalle abitudini familiari e suggerisce ottimizzazioni proattive.
 
-Learn more:
+### **Integrazione Ecosystem**
+- **Smart Home**: Integrazione IoT (luci, termostato, sicurezza)
+- **E-commerce**: Auto-ordering prodotti finiti
+- **Services**: Booking automatico servizi (pulizie, riparazioni)
+- **Financial**: Sincronizzazione conti e investimenti familiari
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+*Ultimo aggiornamento: Gennaio 2025*
+*Versione documento: 1.0* 

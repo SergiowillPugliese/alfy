@@ -1,28 +1,31 @@
 {
-  "name": "frontend",
+  "name": "alfy-fe",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
-  "sourceRoot": "apps/frontend/src",
+  "sourceRoot": "apps/alfy-fe/src",
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@nx/angular:webpack-browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/frontend",
-        "index": "apps/frontend/src/index.html",
-        "main": "apps/frontend/src/main.ts",
+        "outputPath": "dist/apps/alfy-fe",
+        "index": "apps/alfy-fe/src/index.html",
+        "main": "apps/alfy-fe/src/main.ts",
         "polyfills": ["zone.js"],
-        "tsConfig": "apps/frontend/tsconfig.app.json",
+        "tsConfig": "apps/alfy-fe/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
           {
             "glob": "**/*",
-            "input": "apps/frontend/public"
+            "input": "apps/alfy-fe/public"
           }
         ],
-        "styles": ["apps/frontend/src/styles.scss"]
+        "styles": ["apps/alfy-fe/src/styles.scss"],
+        "customWebpackConfig": {
+          "path": "apps/alfy-fe/webpack.config.ts"
+        }
       },
       "configurations": {
         "production": {
@@ -38,7 +41,10 @@
               "maximumError": "8kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "customWebpackConfig": {
+            "path": "apps/alfy-fe/webpack.prod.config.ts"
+          }
         },
         "development": {
           "buildOptimizer": false,
@@ -53,21 +59,27 @@
     },
     "serve": {
       "continuous": true,
-      "executor": "@angular-devkit/build-angular:dev-server",
+      "executor": "@nx/angular:module-federation-dev-server",
+      "options": {
+        "port": 4200,
+        "publicHost": "http://localhost:4200",
+        "proxyConfig": "apps/alfy-fe/proxy.conf.json"
+      },
       "configurations": {
         "production": {
-          "buildTarget": "frontend:build:production"
+          "buildTarget": "alfy-fe:build:production"
         },
         "development": {
-          "buildTarget": "frontend:build:development"
+          "buildTarget": "alfy-fe:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "dependsOn": ["alfy-be:serve"]
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "buildTarget": "frontend:build"
+        "buildTarget": "alfy-fe:build"
       }
     },
     "lint": {
@@ -77,7 +89,8 @@
       "continuous": true,
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "frontend:build",
+        "buildTarget": "alfy-fe:build",
+        "port": 4200,
         "spa": true
       }
     }

@@ -25,6 +25,22 @@
         "{workspaceRoot}/.eslintignore",
         "{workspaceRoot}/eslint.config.mjs"
       ]
+    },
+    "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "@nx/angular:webpack-browser": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": [
+        "production",
+        "^production",
+        {
+          "env": "NX_MF_DEV_REMOTES"
+        }
+      ]
     }
   },
   "generators": {
@@ -34,5 +50,23 @@
       "style": "scss",
       "unitTestRunner": "none"
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/webpack/plugin",
+      "options": {
+        "buildTargetName": "build",
+        "serveTargetName": "serve",
+        "previewTargetName": "preview",
+        "buildDepsTargetName": "build-deps",
+        "watchDepsTargetName": "watch-deps"
+      }
+    },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "eslint:lint"
+      }
+    }
+  ]
 }
