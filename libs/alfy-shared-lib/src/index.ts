@@ -1,1 +1,2 @@
-export * from './lib/alfy-shared-lib';
+
+export * from './lib/index'
