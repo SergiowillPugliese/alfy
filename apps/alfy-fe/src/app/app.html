@@ -1,5 +1,29 @@
-<ul class="remote-menu">
-  <li><a routerLink="/">Home</a></li>
-  <li><a routerLink="mfShopping">MfShopping</a></li>
-</ul>
-<router-outlet></router-outlet>
+@if(!isMobile()) {
+  <p-menubar [model]="items()">
+    <ng-template #start>
+      <img routerLink="/" width="60" height="60" src="logo.svg" alt="logo" class="logo cursor-pointer">
+    </ng-template>
+    <ng-template #item let-item let-root="root">
+      <a [routerLink]="item.routerLink" pRipple class="flex items-center p-menubar-item-link">
+        <span>{{ item.label }}</span>
+        <i [class]="item.icon" class="ml-auto"></i>
+      </a>
+    </ng-template>
+  </p-menubar>
+} @else {
+  <p-drawer [(visible)]="visible" header="Drawer">
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+        et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+        aliquip ex ea commodo consequat.
+    </p>
+  </p-drawer>
+  <div class="fixed top-0 left-0 right-0 flex align-items-center py-2 px-3" style="background-color: #f8fafc;">
+    <img routerLink="/" width="60" height="60" src="logo.svg" alt="logo" class="logo cursor-pointer">
+    <p-button [size]="'large'" [rounded]="true" variant="text" severity="contrast" (click)="toggleSidebar()" icon="pi pi-bars" />
+  </div>
+}
+
+<div [style.marginTop]="isMobile() ? '6rem' : '0'">
+  <router-outlet></router-outlet>
+</div>
