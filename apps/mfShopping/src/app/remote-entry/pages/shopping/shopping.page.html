@@ -1,1 +1,15 @@
-<p>shopping works!</p>
+<div class="p-3 flex flex-column gap-3 lg:flex-row flex-wrap">
+    @for(item of lists(); track item._id) {
+        <p-card class="w-full lg:w-4 xl:w-3 p-3" [style]="{ overflow: 'hidden' }">
+            <ng-template #title> {{ item.name }} </ng-template>
+            <ng-template #subtitle> {{ item.createdAt | date:'dd/MM/yyyy' }} - {{ item.updatedAt | date:'dd/MM/yyyy' }} </ng-template>
+            Elementi in lista: {{item.list.length}}
+            <!-- <ng-template #footer>
+                <div class="flex gap-4 mt-1">
+                    <p-button label="Cancel" severity="secondary" class="w-full" [outlined]="true" styleClass="w-full" />
+                    <p-button label="Save" class="w-full" styleClass="w-full" />
+                </div>
+            </ng-template> -->
+        </p-card>
+    }
+</div>

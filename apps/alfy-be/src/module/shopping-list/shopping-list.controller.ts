@@ -11,7 +11,11 @@ import { ShoppingListService } from './shopping-list.service';
 import { CreateShoppingListDTO } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ShoppingList } from './entities/shopping-list.entity';
+import { 
+  ShoppingListResponseDto, 
+  ShoppingListArrayResponseDto, 
+  DeleteResponseDto 
+} from './dto/shopping-list-response.dto';
 
 @ApiTags('Shopping List')
 @Controller('shopping-list')
@@ -22,7 +26,7 @@ export class ShoppingListController {
   @ApiResponse({
     status: 201,
     description: 'Shopping list successfully created',
-    type: ShoppingList,
+    type: ShoppingListResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -37,7 +41,7 @@ export class ShoppingListController {
   @ApiResponse({
     status: 200,
     description: 'List of all shopping lists',
-    type: [ShoppingList],
+    type: ShoppingListArrayResponseDto,
   })
   @Get()
   findAll() {
@@ -48,7 +52,7 @@ export class ShoppingListController {
   @ApiResponse({
     status: 200,
     description: 'Shopping list found',
-    type: ShoppingList,
+    type: ShoppingListResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -63,7 +67,7 @@ export class ShoppingListController {
   @ApiResponse({
     status: 200,
     description: 'Shopping list successfully updated',
-    type: ShoppingList,
+    type: ShoppingListResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -85,6 +89,7 @@ export class ShoppingListController {
   @ApiResponse({
     status: 200,
     description: 'Shopping list successfully deleted',
+    type: DeleteResponseDto,
   })
   @ApiResponse({
     status: 404,

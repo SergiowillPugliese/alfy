@@ -15,6 +15,19 @@ const config: ModuleFederationConfig = {
    *
    */
   remotes: [['mfShopping', 'http://localhost:4201']],
+  shared: (libraryName, defaultConfig) => {
+    if (libraryName === '@angular/core' || 
+        libraryName === '@angular/common' || 
+        libraryName === '@angular/router') {
+      return { singleton: true, strictVersion: true };
+    }
+    if (libraryName === 'primeng' || 
+        libraryName === 'primeflex' || 
+        libraryName === 'primeicons') {
+      return { singleton: true, strictVersion: false };
+    }
+    return defaultConfig;
+  },
 };
 
 /**

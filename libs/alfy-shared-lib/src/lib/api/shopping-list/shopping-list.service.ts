@@ -20,7 +20,9 @@ import { Observable } from 'rxjs';
 
 import type {
   CreateShoppingListDTO,
-  ShoppingList,
+  DeleteResponseDto,
+  ShoppingListArrayResponseDto,
+  ShoppingListResponseDto,
   UpdateShoppingListDto,
 } from '../alfyAPI.schemas';
 
@@ -52,19 +54,19 @@ export class ShoppingListService {
   /**
    * @summary Create a new shopping list
    */
-  shoppingListControllerCreate<TData = ShoppingList>(
+  shoppingListControllerCreate<TData = ShoppingListResponseDto>(
     createShoppingListDTO: CreateShoppingListDTO,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
   ): Observable<TData>;
-  shoppingListControllerCreate<TData = ShoppingList>(
+  shoppingListControllerCreate<TData = ShoppingListResponseDto>(
     createShoppingListDTO: CreateShoppingListDTO,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
   ): Observable<AngularHttpResponse<TData>>;
-  shoppingListControllerCreate<TData = ShoppingList>(
+  shoppingListControllerCreate<TData = ShoppingListResponseDto>(
     createShoppingListDTO: CreateShoppingListDTO,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
   ): Observable<HttpEvent<TData>>;
-  shoppingListControllerCreate<TData = ShoppingList>(
+  shoppingListControllerCreate<TData = ShoppingListResponseDto>(
     createShoppingListDTO: CreateShoppingListDTO,
     options?: HttpClientOptions
   ): Observable<TData> {
@@ -77,16 +79,16 @@ export class ShoppingListService {
   /**
    * @summary Get all shopping lists
    */
-  shoppingListControllerFindAll<TData = ShoppingList[]>(
+  shoppingListControllerFindAll<TData = ShoppingListArrayResponseDto>(
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
   ): Observable<TData>;
-  shoppingListControllerFindAll<TData = ShoppingList[]>(
+  shoppingListControllerFindAll<TData = ShoppingListArrayResponseDto>(
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
   ): Observable<AngularHttpResponse<TData>>;
-  shoppingListControllerFindAll<TData = ShoppingList[]>(
+  shoppingListControllerFindAll<TData = ShoppingListArrayResponseDto>(
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
   ): Observable<HttpEvent<TData>>;
-  shoppingListControllerFindAll<TData = ShoppingList[]>(
+  shoppingListControllerFindAll<TData = ShoppingListArrayResponseDto>(
     options?: HttpClientOptions
   ): Observable<TData> {
     return this.http.get<TData>(`/api/shopping-list`, options);
@@ -94,19 +96,19 @@ export class ShoppingListService {
   /**
    * @summary Get a shopping list by id
    */
-  shoppingListControllerFindOne<TData = ShoppingList>(
+  shoppingListControllerFindOne<TData = ShoppingListResponseDto>(
     id: string,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
   ): Observable<TData>;
-  shoppingListControllerFindOne<TData = ShoppingList>(
+  shoppingListControllerFindOne<TData = ShoppingListResponseDto>(
     id: string,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
   ): Observable<AngularHttpResponse<TData>>;
-  shoppingListControllerFindOne<TData = ShoppingList>(
+  shoppingListControllerFindOne<TData = ShoppingListResponseDto>(
     id: string,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
   ): Observable<HttpEvent<TData>>;
-  shoppingListControllerFindOne<TData = ShoppingList>(
+  shoppingListControllerFindOne<TData = ShoppingListResponseDto>(
     id: string,
     options?: HttpClientOptions
   ): Observable<TData> {
@@ -115,22 +117,22 @@ export class ShoppingListService {
   /**
    * @summary Update a shopping list by id
    */
-  shoppingListControllerUpdate<TData = ShoppingList>(
+  shoppingListControllerUpdate<TData = ShoppingListResponseDto>(
     id: string,
     updateShoppingListDto: UpdateShoppingListDto,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
   ): Observable<TData>;
-  shoppingListControllerUpdate<TData = ShoppingList>(
+  shoppingListControllerUpdate<TData = ShoppingListResponseDto>(
     id: string,
     updateShoppingListDto: UpdateShoppingListDto,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
   ): Observable<AngularHttpResponse<TData>>;
-  shoppingListControllerUpdate<TData = ShoppingList>(
+  shoppingListControllerUpdate<TData = ShoppingListResponseDto>(
     id: string,
     updateShoppingListDto: UpdateShoppingListDto,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
   ): Observable<HttpEvent<TData>>;
-  shoppingListControllerUpdate<TData = ShoppingList>(
+  shoppingListControllerUpdate<TData = ShoppingListResponseDto>(
     id: string,
     updateShoppingListDto: UpdateShoppingListDto,
     options?: HttpClientOptions
@@ -144,19 +146,19 @@ export class ShoppingListService {
   /**
    * @summary Delete a shopping list by id
    */
-  shoppingListControllerRemove<TData = void>(
+  shoppingListControllerRemove<TData = DeleteResponseDto>(
     id: string,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
   ): Observable<TData>;
-  shoppingListControllerRemove<TData = void>(
+  shoppingListControllerRemove<TData = DeleteResponseDto>(
     id: string,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
   ): Observable<AngularHttpResponse<TData>>;
-  shoppingListControllerRemove<TData = void>(
+  shoppingListControllerRemove<TData = DeleteResponseDto>(
     id: string,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
   ): Observable<HttpEvent<TData>>;
-  shoppingListControllerRemove<TData = void>(
+  shoppingListControllerRemove<TData = DeleteResponseDto>(
     id: string,
     options?: HttpClientOptions
   ): Observable<TData> {
@@ -165,12 +167,12 @@ export class ShoppingListService {
 }
 
 export type ShoppingListControllerCreateClientResult =
-  NonNullable<ShoppingList>;
-export type ShoppingListControllerFindAllClientResult = NonNullable<
-  ShoppingList[]
->;
+  NonNullable<ShoppingListResponseDto>;
+export type ShoppingListControllerFindAllClientResult =
+  NonNullable<ShoppingListArrayResponseDto>;
 export type ShoppingListControllerFindOneClientResult =
-  NonNullable<ShoppingList>;
+  NonNullable<ShoppingListResponseDto>;
 export type ShoppingListControllerUpdateClientResult =
-  NonNullable<ShoppingList>;
-export type ShoppingListControllerRemoveClientResult = NonNullable<void>;
+  NonNullable<ShoppingListResponseDto>;
+export type ShoppingListControllerRemoveClientResult =
+  NonNullable<DeleteResponseDto>;

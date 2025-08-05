@@ -5,9 +5,10 @@ import { MenubarModule } from 'primeng/menubar';
 import { appRoutes } from './app.routes';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
-  imports: [RouterModule, MenubarModule, DrawerModule, ButtonModule],
+  imports: [RouterModule, MenubarModule, DrawerModule, ButtonModule, ToastModule],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',

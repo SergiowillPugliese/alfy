@@ -49,6 +49,28 @@ export interface ShoppingList {
   updatedAt: string;
 }
 
+export interface ShoppingListResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: ShoppingList;
+  /** Error message if request failed */
+  error?: string;
+}
+
+export interface ShoppingListArrayResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: ShoppingList[];
+  /** Error message if request failed */
+  error?: string;
+}
+
 export interface UpdateShoppingListDto {
   /** The name of the shopping list */
   name?: string;
@@ -56,4 +78,15 @@ export interface UpdateShoppingListDto {
   bought?: boolean;
   /** The list of items in the shopping list */
   list?: ShoppingListItemDTO[];
+}
+
+export interface DeleteResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: null;
+  /** Error message if request failed */
+  error?: string;
 }

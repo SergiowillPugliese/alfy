@@ -1,7 +1,16 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class BaseResponseDto<T> {
+  @ApiProperty({ description: 'Indicates if the request was successful' })
   success: boolean;
+
+  @ApiProperty({ description: 'Optional message describing the result', required: false })
   message?: string;
+
+  @ApiProperty({ description: 'The actual data payload', required: false })
   data?: T;
+
+  @ApiProperty({ description: 'Error message if request failed', required: false })
   error?: string;
 
   constructor(success: boolean, data?: T, message?: string, error?: string) {
