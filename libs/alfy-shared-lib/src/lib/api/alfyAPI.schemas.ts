@@ -25,7 +25,7 @@ export interface CreateShoppingListDTO {
 
 export interface ShoppingListItemEntity {
   /** The unique identifier of the item */
-  id: string;
+  _id: string;
   /** The name of the shopping item */
   name: string;
   /** The quantity of the item */
@@ -85,8 +85,11 @@ export interface DeleteResponseDto {
   success: boolean;
   /** Optional message describing the result */
   message?: string;
-  /** The actual data payload */
-  data?: null;
+  /**
+   * The actual data payload
+   * @nullable
+   */
+  data?: string;
   /** Error message if request failed */
   error?: string;
 }

@@ -1,0 +1,11 @@
+<div class="flex justify-content-between pb-3">
+    <div>
+        <p-button class="go-back-button" icon="pi pi-arrow-left" />
+    </div>
+    @if(options()?.addButton) {
+    <div class="flex justify-center">
+        <p-button [raised]="true" class="p-2" (click)="onAddItem()" icon="pi pi-plus" [label]="options()?.addButtonLabel">
+        </p-button>
+      </div>
+    }
+</div>

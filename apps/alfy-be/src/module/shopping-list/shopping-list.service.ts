@@ -61,15 +61,115 @@ export class ShoppingListService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} shoppingList`;
+  async findOne(id: string): Promise<BaseResponseDto<ShoppingList | null>> {
+    try {
+      const shoppingList = await this.shoppingListModel.findById(id);
+      
+      if (!shoppingList) {
+        throw new HttpException(
+          {
+            success: false,
+            message: 'Shopping list not found',
+            data: null,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return {
+        success: true,
+        message: 'Shopping list fetched successfully',
+        data: shoppingList,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Shopping list fetching failed. ' + error.message,
+          data: null,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  update(id: number, updateShoppingListDto: UpdateShoppingListDto) {
-    return `This action updates a #${id} shoppingList`;
+  async update(id: string, updateShoppingListDto: UpdateShoppingListDto): Promise<BaseResponseDto<ShoppingList | null>> {
+    try {
+      const updatedShoppingList = await this.shoppingListModel.findByIdAndUpdate(
+        id,
+        updateShoppingListDto,
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedShoppingList) {
+        throw new HttpException(
+          {
+            success: false,
+            message: 'Shopping list not found',
+            data: null,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return {
+        success: true,
+        message: 'Shopping list updated successfully',
+        data: updatedShoppingList,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Shopping list update failed. ' + error.message,
+          data: null,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} shoppingList`;
+  async remove(id: string): Promise<BaseResponseDto<null>> {
+    try {
+      const deletedShoppingList = await this.shoppingListModel.findByIdAndDelete(id);
+
+      if (!deletedShoppingList) {
+        throw new HttpException(
+          {
+            success: false,
+            message: 'Shopping list not found',
+            data: null,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return {
+        success: true,
+        message: 'Shopping list deleted successfully',
+        data: null,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Shopping list deletion failed. ' + error.message,
+          data: null,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

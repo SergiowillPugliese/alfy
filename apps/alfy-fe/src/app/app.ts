@@ -6,9 +6,10 @@ import { appRoutes } from './app.routes';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
-  imports: [RouterModule, MenubarModule, DrawerModule, ButtonModule, ToastModule],
+  imports: [RouterModule, MenubarModule, DrawerModule, ButtonModule, ToastModule, DividerModule],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',

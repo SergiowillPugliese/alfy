@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ShoppingList, ShoppingListService } from '@alfy/alfy-shared-lib';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -13,10 +14,16 @@ import { ShoppingList, ShoppingListService } from '@alfy/alfy-shared-lib';
 })
 export class ShoppingPage {
   private readonly _shoppingService = inject(ShoppingListService);
+  private readonly _router = inject(Router);
+  
   lists = signal<ShoppingList[]>([]);
 
   constructor() {
     this._loadLists();
+  }
+
+  navigateTo(item: ShoppingList) {
+    this._router.navigate(['/mfShopping', item._id, item.name]);
   }
 
 

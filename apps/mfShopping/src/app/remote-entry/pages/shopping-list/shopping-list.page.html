@@ -1,0 +1,82 @@
+<div class="p-3">
+  <app-option-bar [options]="optionsBar()" (addItem)="onOpenaddItem()" />
+
+  <p-table
+    [value]="items()"
+    [(selection)]="selectedItems"
+    dataKey="_id"
+    [tableStyle]="{'min-width': '50rem'}"
+  >
+    <ng-template #header>
+      <tr>
+        <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Quantità</th>
+        <th>Acquistato</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-product>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="product" />
+        </td>
+        <td>{{product._id}}</td>
+        <td>{{product.name}}</td>
+        <td>{{product.quantity}}</td>
+        <td>{{product.bought ? 'Si' : 'No'}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  @if(items().length > 0) { @for(item of items(); track $index) {
+
+  <div class="flex items-center">
+    <p-checkbox
+      [ngModel]="item.bought"
+      (ngModelChange)="onItemBoughtChange($index, $event)"
+      [binary]="true"
+      [inputId]="item._id"
+    >
+    </p-checkbox>
+    <label [for]="item._id" class="ml-2"> {{ item.name }} </label>
+  </div>
+  } } @else {
+  <div
+    class="fixed top-50 left-50 w-6 h-15rem border-1 border-round p-3 flex justify-content-center align-items-center bg-card"
+    style="
+      transform: translate(-50%, -50%);
+      border-color: var(--p-divider-border-color);
+    "
+  >
+    <div
+      class="flex flex-column gap-2 justify-content-center align-items-center w-6"
+    >
+      <h2 class="text-center">Nessun elemento</h2>
+      <p-button
+        class="p-2"
+        size="large"
+        outlined="true"
+        (click)="onOpenaddItem()"
+        icon="pi pi-plus"
+        label="Aggiungi"
+      />
+    </div>
+  </div>
+  }
+</div>
+
+<p-dialog
+  header="Header"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '50rem' }"
+>
+  <form [formGroup]="addItemForm">
+    <div class="flex flex-column gap-2">
+      <input type="text" label="Nome" formControlName="elementName" />
+      <p-inputNumber label="Quantità" formControlName="elementQuantity" />
+    </div>
+    <p-button label="Aggiungi" (click)="onAddItem()" />
+  </form>
+</p-dialog>

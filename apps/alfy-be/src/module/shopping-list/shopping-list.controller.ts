@@ -60,7 +60,7 @@ export class ShoppingListController {
   })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.shoppingListService.findOne(+id);
+    return this.shoppingListService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Update a shopping list by id' })
@@ -82,7 +82,7 @@ export class ShoppingListController {
     @Param('id') id: string,
     @Body() updateShoppingListDto: UpdateShoppingListDto,
   ) {
-    return this.shoppingListService.update(+id, updateShoppingListDto);
+    return this.shoppingListService.update(id, updateShoppingListDto);
   }
 
   @ApiOperation({ summary: 'Delete a shopping list by id' })
@@ -97,6 +97,6 @@ export class ShoppingListController {
   })
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.shoppingListService.remove(+id);
+    return this.shoppingListService.remove(id);
   }
 }

@@ -1,6 +1,6 @@
 <div class="p-3 flex flex-column gap-3 lg:flex-row flex-wrap">
     @for(item of lists(); track item._id) {
-        <p-card class="w-full lg:w-4 xl:w-3 p-3" [style]="{ overflow: 'hidden' }">
+        <p-card class="w-full lg:w-4 xl:w-3 p-3 cursor-pointer" [style]="{ overflow: 'hidden' }" (click)="navigateTo(item)">
             <ng-template #title> {{ item.name }} </ng-template>
             <ng-template #subtitle> {{ item.createdAt | date:'dd/MM/yyyy' }} - {{ item.updatedAt | date:'dd/MM/yyyy' }} </ng-template>
             Elementi in lista: {{item.list.length}}
@@ -10,6 +10,7 @@
                     <p-button label="Save" class="w-full" styleClass="w-full" />
                 </div>
             </ng-template> -->
+            
         </p-card>
     }
 </div>

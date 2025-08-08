@@ -5,8 +5,16 @@
  width="1024.000000pt" height="1024.000000pt" viewBox="0 0 1024.000000 1024.000000"
  preserveAspectRatio="xMidYMid meet">
 
+<defs>
+  <linearGradient id="myGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" style="stop-color:rgba(64, 64, 72, 1);stop-opacity:1" />
+    <stop offset="50%" style="stop-color:rgba(86, 156, 193, 1);stop-opacity:1" />
+    <stop offset="100%" style="stop-color:rgba(252, 196, 4, 1);stop-opacity:1" />
+  </linearGradient>
+</defs>
+
 <g transform="translate(0.000000,1024.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
+fill="#569CC1" stroke="none">
 <path d="M4865 8971 c-162 -44 -268 -95 -395 -189 -109 -81 -188 -165 -244
 -260 -54 -91 -126 -287 -126 -343 0 -34 -4 -39 -66 -75 -84 -49 -109 -82 -130
 -170 -20 -86 -14 -298 11 -389 23 -84 77 -192 121 -244 40 -46 140 -101 184

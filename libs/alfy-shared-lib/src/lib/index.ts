@@ -13,3 +13,6 @@ export * from './services/toast/toast.model';
 
 // Export interceptor
 export * from './interceptors/error.interceptor';
+
+// Export componenti
+export * from './components/option-bar/option-bar.component';

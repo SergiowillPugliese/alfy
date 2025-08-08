@@ -19,15 +19,14 @@
       </a>
     }
   </p-drawer>
-  <div class="fixed top-0 left-0 right-0 flex align-items-center py-2 px-3" style="background-color: #f8fafc;">
+  <div class="flex align-items-center py-2 px-3" style="background-color: #f8fafc;">
     <img routerLink="/" width="60" height="60" src="logo.svg" alt="logo" class="logo cursor-pointer">
     <p-button [size]="'large'" [rounded]="true" variant="text" severity="contrast" (click)="toggleSidebar()" icon="pi pi-bars" />
   </div>
 }
+<p-divider />
 
-<div [style.marginTop]="isMobile() ? '6rem' : '0'">
   <router-outlet></router-outlet>
-</div>
 
 <!-- Toast per messaggi globali -->
 <p-toast />

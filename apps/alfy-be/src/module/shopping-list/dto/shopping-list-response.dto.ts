@@ -13,6 +13,6 @@ export class ShoppingListArrayResponseDto extends BaseResponseDto<ShoppingList[]
 }
 
 export class DeleteResponseDto extends BaseResponseDto<null> {
-  @ApiProperty({ type: 'null', required: false })
+  @ApiProperty({ type: String, nullable: true, required: false })
   data?: null;
 }
