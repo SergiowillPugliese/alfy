@@ -24,6 +24,7 @@ import type {
   ShoppingListArrayResponseDto,
   ShoppingListResponseDto,
   UpdateShoppingListDto,
+  UpdateShoppingListItemDto,
 } from '../alfyAPI.schemas';
 
 type HttpClientOptions = {
@@ -164,6 +165,39 @@ export class ShoppingListService {
   ): Observable<TData> {
     return this.http.delete<TData>(`/api/shopping-list/${id}`, options);
   }
+  /**
+   * @summary Update a specific item in a shopping list
+   */
+  shoppingListControllerUpdateItem<TData = ShoppingListResponseDto>(
+    id: string,
+    itemId: string,
+    updateShoppingListItemDto: UpdateShoppingListItemDto,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
+  ): Observable<TData>;
+  shoppingListControllerUpdateItem<TData = ShoppingListResponseDto>(
+    id: string,
+    itemId: string,
+    updateShoppingListItemDto: UpdateShoppingListItemDto,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
+  ): Observable<AngularHttpResponse<TData>>;
+  shoppingListControllerUpdateItem<TData = ShoppingListResponseDto>(
+    id: string,
+    itemId: string,
+    updateShoppingListItemDto: UpdateShoppingListItemDto,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
+  ): Observable<HttpEvent<TData>>;
+  shoppingListControllerUpdateItem<TData = ShoppingListResponseDto>(
+    id: string,
+    itemId: string,
+    updateShoppingListItemDto: UpdateShoppingListItemDto,
+    options?: HttpClientOptions
+  ): Observable<TData> {
+    return this.http.patch<TData>(
+      `/api/shopping-list/${id}/items/${itemId}`,
+      updateShoppingListItemDto,
+      options
+    );
+  }
 }
 
 export type ShoppingListControllerCreateClientResult =
@@ -176,3 +210,5 @@ export type ShoppingListControllerUpdateClientResult =
   NonNullable<ShoppingListResponseDto>;
 export type ShoppingListControllerRemoveClientResult =
   NonNullable<DeleteResponseDto>;
+export type ShoppingListControllerUpdateItemClientResult =
+  NonNullable<ShoppingListResponseDto>;

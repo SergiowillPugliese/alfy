@@ -41,6 +41,16 @@ export class ToastService {
     this.show(message);
   }
 
+  showErrorMessage(message: ToastMessage) {
+    const errorMessage: ToastMessage = {
+      severity: 'error',
+      summary: 'Errore',
+      detail: message.detail,
+      life: 3000
+    };
+    this.show(errorMessage);
+  }
+
   private getErrorMessage(error: HttpErrorContext): string {
     if (error.status === 0) return 'Impossibile connettersi al server';
     if (error.status === 404) return 'Risorsa non trovata';

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateShoppingListDTO } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
+import { UpdateShoppingListItemDto } from './dto/update-shopping-list-item.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ShoppingList } from './entities/shopping-list.entity';
 import { Model } from 'mongoose';
@@ -130,6 +131,54 @@ export class ShoppingListService {
         {
           success: false,
           message: 'Shopping list update failed. ' + error.message,
+          data: null,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  //metodo che aggiorna il singolo item e lo setta come acquistato o non acquistato quando dal frontend viene cliccato il checkbox
+  async updateItem(id: string, itemId: string, updateItemDto: UpdateShoppingListItemDto): Promise<BaseResponseDto<ShoppingList | null>> {
+    try {
+      // Trova la shopping list
+      const shoppingList = await this.shoppingListModel.findById(id);
+      if (!shoppingList) {
+        throw new HttpException(
+          { success: false, message: 'Shopping list not found', data: null },
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      // Trova l'item specifico
+      const itemIndex = shoppingList.list.findIndex(item => item._id.toString() === itemId);
+      if (itemIndex === -1) {
+        throw new HttpException(
+          { success: false, message: 'Item not found', data: null },
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      // Aggiorna solo l'item specifico
+      shoppingList.list[itemIndex].bought = updateItemDto.bought;
+      
+      // Salva la shopping list aggiornata
+      const updatedShoppingList = await shoppingList.save();
+
+      return {
+        success: true,
+        message: 'Item updated successfully',
+        data: updatedShoppingList,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Item update failed. ' + error.message,
           data: null,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,

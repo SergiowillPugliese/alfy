@@ -1,6 +1,7 @@
-import { Component, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { Component, inject, signal, OnInit, DestroyRef, model, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import {
   OptionBarComponent,
   Options,
@@ -37,6 +38,7 @@ import { TableModule } from 'primeng/table';
     ReactiveFormsModule,
     FormsModule,
     TableModule,
+    ProgressSpinnerModule,
   ],
   templateUrl: './shopping-list.page.html',
   styleUrl: './shopping-list.page.scss',
@@ -54,7 +56,8 @@ export class ShoppingListPage implements OnInit {
 
   items = signal<ShoppingListItemEntity[]>([]);
   visible = signal(false);
-  selectedItems!: ShoppingListItemEntity;
+  loading = signal(false);
+
   id = this._route.snapshot.params['id'];
 
   addItemForm = new FormGroup({
@@ -68,36 +71,13 @@ export class ShoppingListPage implements OnInit {
     }
   }
 
-  onItemBoughtChange(itemIndex: number, bought: boolean) {
-    const currentItems = this.items();
-    const updatedItems = currentItems.map((item, index) => {
-      if (index === itemIndex) {
-        return { name: item.name, quantity: item.quantity, bought };
-      } else {
-        return { name: item.name, quantity: item.quantity, bought: item.bought };
-      }
-    });
-
-    this._shoppingService
-      .shoppingListControllerUpdate(this.id, {
-        list: updatedItems,
-      })
-      .subscribe({
-        next: (response) => {
-          if (response.data?.list) {
-            this.items.set(response.data.list);
-          }
-        },
-        error: (error) => this._toast.showHttpError(error),
-      });
-  }
-
   onOpenaddItem() {
     console.log('addItem');
     this.visible.set(true);
   }
 
   onAddItem() {
+    this.loading.set(true);
     const item: ShoppingListItemDTO = {
       name: this.addItemForm.value.elementName || '',
       quantity: Number(this.addItemForm.get('elementQuantity')?.value) || 0,
@@ -116,17 +96,46 @@ export class ShoppingListPage implements OnInit {
           this.addItemForm.reset();
         },
         error: (error) => this._toast.showHttpError(error),
-        complete: () =>
+        complete: () => {
+          this.loading.set(false);
           this._toast.showSuccessMessage({
             severity: 'success',
             summary: 'Successo',
             detail: 'Elemento aggiunto con successo',
             life: 3000,
-          }),
+          });
+        },
+      });
+  }
+
+  onToggleBought(product: ShoppingListItemEntity) {
+    this.loading.set(true);
+    this._shoppingService
+      .shoppingListControllerUpdateItem(this.id, product._id, {
+        bought: !product.bought,
+      })
+      .subscribe({
+        next: (response) => {
+          if (!response.success) {
+            this._toast.showErrorMessage({
+              severity: 'error',
+              summary: 'Errore',
+              detail: response.message || 'Errore',
+              life: 5000,
+            });
+          } else {
+            this._loadItems(this.id);
+          }
+        },
+        error: (error) => this._toast.showHttpError(error),
+        complete: () => {
+          this.loading.set(false);
+        },
       });
   }
 
   private _loadItems(id: string) {
+    this.loading.set(true);
     this._shoppingService
       .shoppingListControllerFindOne(id)
       .pipe(takeUntilDestroyed(this._destroyRef))
@@ -135,6 +144,9 @@ export class ShoppingListPage implements OnInit {
           this.items.set(response.data?.list || []);
         },
         error: (error) => this._toast.showHttpError(error),
+        complete: () => {
+          this.loading.set(false);
+        },
       });
   }
 }

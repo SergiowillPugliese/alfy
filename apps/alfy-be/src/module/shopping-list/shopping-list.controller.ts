@@ -10,6 +10,7 @@ import {
 import { ShoppingListService } from './shopping-list.service';
 import { CreateShoppingListDTO } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
+import { UpdateShoppingListItemDto } from './dto/update-shopping-list-item.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { 
   ShoppingListResponseDto, 
@@ -83,6 +84,29 @@ export class ShoppingListController {
     @Body() updateShoppingListDto: UpdateShoppingListDto,
   ) {
     return this.shoppingListService.update(id, updateShoppingListDto);
+  }
+
+  @ApiOperation({ summary: 'Update a specific item in a shopping list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Item successfully updated',
+    type: ShoppingListResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Shopping list or item not found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid input data',
+  })
+  @Patch(':id/items/:itemId')
+  updateItem(
+    @Param('id') id: string,
+    @Param('itemId') itemId: string,
+    @Body() updateItemDto: UpdateShoppingListItemDto,
+  ) {
+    return this.shoppingListService.updateItem(id, itemId, updateItemDto);
   }
 
   @ApiOperation({ summary: 'Delete a shopping list by id' })

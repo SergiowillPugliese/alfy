@@ -80,6 +80,11 @@ export interface UpdateShoppingListDto {
   list?: ShoppingListItemDTO[];
 }
 
+export interface UpdateShoppingListItemDto {
+  /** Whether the item has been bought */
+  bought: boolean;
+}
+
 export interface DeleteResponseDto {
   /** Indicates if the request was successful */
   success: boolean;
