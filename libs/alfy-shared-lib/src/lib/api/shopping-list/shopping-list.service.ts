@@ -198,6 +198,34 @@ export class ShoppingListService {
       options
     );
   }
+  /**
+   * @summary Delete a specific item in a shopping list
+   */
+  shoppingListControllerRemoveItem<TData = DeleteResponseDto>(
+    id: string,
+    itemId: string,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
+  ): Observable<TData>;
+  shoppingListControllerRemoveItem<TData = DeleteResponseDto>(
+    id: string,
+    itemId: string,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
+  ): Observable<AngularHttpResponse<TData>>;
+  shoppingListControllerRemoveItem<TData = DeleteResponseDto>(
+    id: string,
+    itemId: string,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
+  ): Observable<HttpEvent<TData>>;
+  shoppingListControllerRemoveItem<TData = DeleteResponseDto>(
+    id: string,
+    itemId: string,
+    options?: HttpClientOptions
+  ): Observable<TData> {
+    return this.http.delete<TData>(
+      `/api/shopping-list/${id}/items/${itemId}`,
+      options
+    );
+  }
 }
 
 export type ShoppingListControllerCreateClientResult =
@@ -212,3 +240,5 @@ export type ShoppingListControllerRemoveClientResult =
   NonNullable<DeleteResponseDto>;
 export type ShoppingListControllerUpdateItemClientResult =
   NonNullable<ShoppingListResponseDto>;
+export type ShoppingListControllerRemoveItemClientResult =
+  NonNullable<DeleteResponseDto>;

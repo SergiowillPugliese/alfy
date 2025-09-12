@@ -159,8 +159,19 @@ export class ShoppingListService {
         );
       }
 
-      // Aggiorna solo l'item specifico
-      shoppingList.list[itemIndex].bought = updateItemDto.bought;
+      // Aggiorna solo i campi forniti nell'item specifico
+      if (updateItemDto.name !== undefined) {
+        shoppingList.list[itemIndex].name = updateItemDto.name;
+      }
+      if (updateItemDto.quantity !== undefined) {
+        shoppingList.list[itemIndex].quantity = updateItemDto.quantity;
+      }
+      if (updateItemDto.unit !== undefined) {
+        shoppingList.list[itemIndex].unit = updateItemDto.unit;
+      }
+      if (updateItemDto.bought !== undefined) {
+        shoppingList.list[itemIndex].bought = updateItemDto.bought;
+      }
       
       // Salva la shopping list aggiornata
       const updatedShoppingList = await shoppingList.save();
@@ -179,6 +190,63 @@ export class ShoppingListService {
         {
           success: false,
           message: 'Item update failed. ' + error.message,
+          data: null,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async removeItem(id: string, itemId: string): Promise<BaseResponseDto<null>> {
+    try {
+      const shoppingList = await this.shoppingListModel.findById(id);
+      if (!shoppingList) {
+        throw new HttpException(
+          { success: false, message: 'Shopping list not found', data: null },
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      // Trova l'item specifico prima di eliminarlo
+      const itemToRemove = shoppingList.list.find(item => item._id.toString() === itemId);
+      if (!itemToRemove) {
+        throw new HttpException(
+          { success: false, message: 'Item not found', data: null },
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      // Controllo: non permettere eliminazione di prodotti acquistati
+      if (itemToRemove.bought) {
+        throw new HttpException(
+          { 
+            success: false, 
+            message: 'Cannot delete a purchased item. Please mark it as not purchased first.', 
+            data: null 
+          },
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      // Rimuovi l'item dalla lista
+      shoppingList.list = shoppingList.list.filter(item => item._id.toString() !== itemId);
+
+      await shoppingList.save();
+
+      return {
+        success: true,
+        message: 'Item deleted successfully',
+        data: null,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Item deletion failed. ' + error.message,
           data: null,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,

@@ -5,13 +5,32 @@
  * The Alfy API documentation
  * OpenAPI spec version: 1.0
  */
+/**
+ * The unit of measurement for the item
+ */
+export type ShoppingListItemDTOUnit =
+  (typeof ShoppingListItemDTOUnit)[keyof typeof ShoppingListItemDTOUnit];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ShoppingListItemDTOUnit = {
+  pz: 'pz',
+  g: 'g',
+  hg: 'hg',
+  kg: 'kg',
+  ml: 'ml',
+  cl: 'cl',
+  l: 'l',
+} as const;
+
 export interface ShoppingListItemDTO {
   /** The name of the shopping item */
   name: string;
-  /** Whether the item has been bought */
-  bought: boolean;
   /** The quantity of the item */
   quantity: number;
+  /** The unit of measurement for the item */
+  unit: ShoppingListItemDTOUnit;
+  /** Whether the item has been bought */
+  bought: boolean;
 }
 
 export interface CreateShoppingListDTO {
@@ -23,6 +42,23 @@ export interface CreateShoppingListDTO {
   list: ShoppingListItemDTO[];
 }
 
+/**
+ * The unit of measurement for the item
+ */
+export type ShoppingListItemEntityUnit =
+  (typeof ShoppingListItemEntityUnit)[keyof typeof ShoppingListItemEntityUnit];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ShoppingListItemEntityUnit = {
+  pz: 'pz',
+  g: 'g',
+  hg: 'hg',
+  kg: 'kg',
+  ml: 'ml',
+  cl: 'cl',
+  l: 'l',
+} as const;
+
 export interface ShoppingListItemEntity {
   /** The unique identifier of the item */
   _id: string;
@@ -30,6 +66,8 @@ export interface ShoppingListItemEntity {
   name: string;
   /** The quantity of the item */
   quantity: number;
+  /** The unit of measurement for the item */
+  unit: ShoppingListItemEntityUnit;
   /** Whether the item has been bought */
   bought: boolean;
 }
@@ -80,9 +118,32 @@ export interface UpdateShoppingListDto {
   list?: ShoppingListItemDTO[];
 }
 
+/**
+ * The unit of measurement for the item
+ */
+export type UpdateShoppingListItemDtoUnit =
+  (typeof UpdateShoppingListItemDtoUnit)[keyof typeof UpdateShoppingListItemDtoUnit];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateShoppingListItemDtoUnit = {
+  pz: 'pz',
+  g: 'g',
+  hg: 'hg',
+  kg: 'kg',
+  ml: 'ml',
+  cl: 'cl',
+  l: 'l',
+} as const;
+
 export interface UpdateShoppingListItemDto {
+  /** The name of the shopping item */
+  name?: string;
+  /** The quantity of the item */
+  quantity?: number;
+  /** The unit of measurement for the item */
+  unit?: UpdateShoppingListItemDtoUnit;
   /** Whether the item has been bought */
-  bought: boolean;
+  bought?: boolean;
 }
 
 export interface DeleteResponseDto {

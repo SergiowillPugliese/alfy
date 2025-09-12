@@ -18,19 +18,28 @@ export class ShoppingListItemDTO {
   name: string;
 
   @ApiProperty({
+    description: 'The quantity of the item',
+    example: 2,
+  })
+  @IsOptional()
+  quantity: number;
+
+  @ApiProperty({
+    description: 'The unit of measurement for the item',
+    example: 'l',
+    enum: ['pz', 'g', 'hg', 'kg', 'ml', 'cl', 'l'],
+  })
+  @IsOptional()
+  @IsString()
+  unit: string;
+
+  @ApiProperty({
     description: 'Whether the item has been bought',
     example: false,
   })
   @IsOptional()
   @IsBoolean()
   bought: boolean;
-
-  @ApiProperty({
-    description: 'The quantity of the item',
-    example: 2,
-  })
-  @IsOptional()
-  quantity: number;
 }
 
 export class CreateShoppingListDTO {

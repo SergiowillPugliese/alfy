@@ -123,4 +123,19 @@ export class ShoppingListController {
   remove(@Param('id') id: string) {
     return this.shoppingListService.remove(id);
   }
+
+  @ApiOperation({ summary: 'Delete a specific item in a shopping list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Item successfully deleted',
+    type: DeleteResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Shopping list or item not found',
+  })
+  @Delete(':id/items/:itemId')
+  removeItem(@Param('id') id: string, @Param('itemId') itemId: string) {
+    return this.shoppingListService.removeItem(id, itemId);
+  }
 }

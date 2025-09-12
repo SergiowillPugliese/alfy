@@ -6,6 +6,9 @@ import { ReactiveFormsModule } from "@angular/forms";
 export interface Options {
     addButton: boolean
     addButtonLabel: string
+    editButton?: boolean
+    editButtonLabel?: string
+    editMode?: boolean
 }
 
 
@@ -20,9 +23,14 @@ export interface Options {
 export class OptionBarComponent {
     options = input<Options>();
     addItem = output<void>();
+    toggleEdit = output<void>();
 
     onAddItem() {
         this.addItem.emit();
+    }
+
+    onToggleEdit() {
+        this.toggleEdit.emit();
     }
 
 }
