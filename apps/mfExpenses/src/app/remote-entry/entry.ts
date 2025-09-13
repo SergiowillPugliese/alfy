@@ -4,7 +4,7 @@ import { NxWelcome } from './nx-welcome';
 
 @Component({
   imports: [CommonModule, NxWelcome],
-  selector: 'app-mfExpenses-entry',
+  selector: 'app-mf-expenses-entry',
   template: `<app-nx-welcome></app-nx-welcome>`,
 })
 export class RemoteEntry {}
