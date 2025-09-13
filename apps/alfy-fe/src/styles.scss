@@ -5,6 +5,9 @@
 body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
+  background-color: var(--background);
+  height: 99vh;
+  // overflow: hidden;
 }
 
 h1,
@@ -14,24 +17,180 @@ h4,
 h5,
 h6,
 p,
-span,
 a,
-li,
-ul,
-ol,
-div,
-button,
-input,
-textarea,
-select,
-option,
-label,
-form,
-table,
-tr,
-td,
-th {
+label {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  color: var(--text-color);
 }
+
+.p-component.p-drawer.p-drawer-left.p-drawer-open {
+  .p-drawer-header,
+  .p-drawer-content {
+    padding: 0.5rem;
+  }
+}
+
+/* ====================================
+   CARD DESIGN TOKENS - GLOBAL STYLES
+   ===================================== */
+
+:root {
+  --background: #030711;
+  --foreground: #e1e7ef;
+  --muted: #0f1629;
+  --muted-foreground: #7f8ea3;
+  --popover: #030711;
+  --popover-foreground: #94a3b8;
+  --border: #1d283a;
+  --input: #1d283a;
+  --primary: #302831;
+  --secondary: #569cc1;
+  --tertiary: #64647c;
+  --accent: #fcc404;
+  --accent-hover: #fcc4048c;
+  --text-color: #d1d5db;
+  --tw-border-spacing-x: 0;
+  --tw-border-spacing-y: 0;
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246/0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+
+  /* Divider */
+  --p-divider-border-color: #1d283a;
+
+  /* Menubar */
+  --p-menubar-item-color: #d1d5db;
+
+  /* Card Base */
+  --p-card-background: #4040484d;
+  --p-card-border-radius: 12px;
+  --p-card-border-color: var(--card-border);
+  --p-card-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  --p-menubar-background: var(--background);
+ 
+  /* Button */
+  --p-button-primary-background: var(--accent);
+  --p-button-primary-color: #ffffff;
+  --p-button-primary-border-color: var(--accent);
+  --p-button-primary-hover-background: var(--accent-hover);
+  --p-button-primary-hover-color: #ffffff;
+  --p-button-primary-hover-border-color: var(--accent-hover);
+  --p-button-primary-active-background: var(--accent);
+  --p-button-outlined-primary-border-color: var(--accent);
+  --p-button-outlined-primary-color: var(--accent);
+  --p-button-outlined-primary-hover-background: var(--accent-hover);
+  --p-button-outlined-primary-hover-color: #ffffff;
+  --p-button-outlined-primary-hover-border-color: var(--accent-hover);
+
+  /* Card Body */
+  --p-card-body-padding: 1.5rem;
+  --p-card-body-gap: 1rem;
+  --card: #030711;
+  --card-hover: #1d283a;
+  --card-foreground: #e1e7ef;
+  --card-border: #1d283a;
+
+  /* Card Title */
+  --p-card-title-font-size: 1.25rem;
+  --p-card-title-font-weight: 600;
+  --p-card-color: #d1d5db;
+  --p-card-subtitle-color: #d1d5dbb0;
+
+  /* Card Subtitle */
+  --p-card-subtitle-color: #6c757d;
+
+  /* Card Caption */
+  --p-card-caption-gap: 0.75rem;
+}
+
+.p-divider-horizontal {
+  margin: 0;
+  padding: 0;
+
+  &:before {
+    border-block-start: 1px solid var(--p-divider-border-color);
+  }
+}
+
+.p-menubar-item-link {
+  color: var(--p-menubar-item-color);
+}
+
+.p-menubar-item:not(.p-disabled) > .p-menubar-item-content {
+  padding-bottom: 0.1rem;
+  position: relative;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: var(--p-menubar-item-focus-color);
+    background: unset;
+    font-weight: 600;
+  }
+}
+
+/* Stili addizionali per consistenza */
+p-card {
+  transition: all 0.3s ease;
+  border: 1px solid var(--p-card-border-color)!important;
+
+  &:hover {
+    background-color: var(--card-hover);
+    --p-card-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+  }
+
+  .p-card-title {
+    color: var(--p-card-color);
+    line-height: 1.4;
+  }
+
+  .p-card-subtitle {
+    margin-top: 0.25rem;
+    line-height: 1.5;
+  }
+}
+
+.p-button-outlined:not(:disabled):hover {
+  color: var(--p-button-outlined-primary-hover-color);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
+.bg-tertiary {
+  background-color: var(--tertiary);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.bg-accent-hover {
+  background-color: var(--accent-hover);
+}
+
+.bg-card {
+  background-color: var(--p-card-background);
+}
+
+
+

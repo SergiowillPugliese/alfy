@@ -10,8 +10,13 @@ import {
 import { ShoppingListService } from './shopping-list.service';
 import { CreateShoppingListDTO } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
+import { UpdateShoppingListItemDto } from './dto/update-shopping-list-item.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ShoppingList } from './entities/shopping-list.entity';
+import { 
+  ShoppingListResponseDto, 
+  ShoppingListArrayResponseDto, 
+  DeleteResponseDto 
+} from './dto/shopping-list-response.dto';
 
 @ApiTags('Shopping List')
 @Controller('shopping-list')
@@ -22,7 +27,7 @@ export class ShoppingListController {
   @ApiResponse({
     status: 201,
     description: 'Shopping list successfully created',
-    type: ShoppingList,
+    type: ShoppingListResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -37,7 +42,7 @@ export class ShoppingListController {
   @ApiResponse({
     status: 200,
     description: 'List of all shopping lists',
-    type: [ShoppingList],
+    type: ShoppingListArrayResponseDto,
   })
   @Get()
   findAll() {
@@ -48,7 +53,7 @@ export class ShoppingListController {
   @ApiResponse({
     status: 200,
     description: 'Shopping list found',
-    type: ShoppingList,
+    type: ShoppingListResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -56,14 +61,14 @@ export class ShoppingListController {
   })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.shoppingListService.findOne(+id);
+    return this.shoppingListService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Update a shopping list by id' })
   @ApiResponse({
     status: 200,
     description: 'Shopping list successfully updated',
-    type: ShoppingList,
+    type: ShoppingListResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -78,13 +83,37 @@ export class ShoppingListController {
     @Param('id') id: string,
     @Body() updateShoppingListDto: UpdateShoppingListDto,
   ) {
-    return this.shoppingListService.update(+id, updateShoppingListDto);
+    return this.shoppingListService.update(id, updateShoppingListDto);
+  }
+
+  @ApiOperation({ summary: 'Update a specific item in a shopping list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Item successfully updated',
+    type: ShoppingListResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Shopping list or item not found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid input data',
+  })
+  @Patch(':id/items/:itemId')
+  updateItem(
+    @Param('id') id: string,
+    @Param('itemId') itemId: string,
+    @Body() updateItemDto: UpdateShoppingListItemDto,
+  ) {
+    return this.shoppingListService.updateItem(id, itemId, updateItemDto);
   }
 
   @ApiOperation({ summary: 'Delete a shopping list by id' })
   @ApiResponse({
     status: 200,
     description: 'Shopping list successfully deleted',
+    type: DeleteResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -92,6 +121,21 @@ export class ShoppingListController {
   })
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.shoppingListService.remove(+id);
+    return this.shoppingListService.remove(id);
+  }
+
+  @ApiOperation({ summary: 'Delete a specific item in a shopping list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Item successfully deleted',
+    type: DeleteResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Shopping list or item not found',
+  })
+  @Delete(':id/items/:itemId')
+  removeItem(@Param('id') id: string, @Param('itemId') itemId: string) {
+    return this.shoppingListService.removeItem(id, itemId);
   }
 }

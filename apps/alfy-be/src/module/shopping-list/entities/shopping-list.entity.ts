@@ -7,7 +7,7 @@ export class ShoppingListItemEntity {
     description: 'The unique identifier of the item',
     example: '507f1f77bcf86cd799439011',
   })
-  id: string;
+  _id: string;
 
   @ApiProperty({
     description: 'The name of the shopping item',
@@ -22,6 +22,13 @@ export class ShoppingListItemEntity {
   quantity: number;
 
   @ApiProperty({
+    description: 'The unit of measurement for the item',
+    example: 'pz',
+    enum: ['pz', 'g', 'hg', 'kg', 'ml', 'cl', 'l'],
+  })
+  unit: string;
+
+  @ApiProperty({
     description: 'Whether the item has been bought',
     example: false,
   })
@@ -29,9 +36,10 @@ export class ShoppingListItemEntity {
 }
 
 export interface ShoppingListItem {
-  id: string;
+  _id: string;
   name: string;
   quantity: number;
+  unit: string;
   bought: boolean;
 }
 
@@ -62,16 +70,17 @@ export class ShoppingList extends Document {
     type: [ShoppingListItemEntity],
     example: [
       {
-        id: '507f1f77bcf86cd799439012',
+        _id: '507f1f77bcf86cd799439012',
         name: 'Milk',
         quantity: 2,
+        unit: 'l',
         bought: false,
       },
     ],
   })
   @Prop({
     required: false,
-    type: [{ id: String, name: String, quantity: Number, bought: Boolean }],
+    type: [{ id: String, name: String, quantity: Number, unit: String, bought: Boolean }],
   })
   list: ShoppingListItem[];
 

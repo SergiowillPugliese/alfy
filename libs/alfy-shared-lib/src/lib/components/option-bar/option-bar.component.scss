@@ -1,0 +1,19 @@
+.go-back-button {
+    .p-button {
+        background: unset;
+        color: #fff;
+        border: none;
+        border: none;
+        border-radius: 50%;
+        padding: 0.5rem;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+        background: var(--p-button-primary-hover-background);
+        color: var(--p-button-primary-hover-color);
+        }
+    }
+}

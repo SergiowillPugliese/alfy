@@ -16,6 +16,9 @@
     "baseUrl": ".",
     "paths": {
       "@alfy/alfy-shared-lib": ["libs/alfy-shared-lib/src/index.ts"],
+      "mfExpenses/Routes": [
+        "apps/mfExpenses/src/app/remote-entry/entry.routes.ts"
+      ],
       "mfShopping/Routes": [
         "apps/mfShopping/src/app/remote-entry/entry.routes.ts"
       ]

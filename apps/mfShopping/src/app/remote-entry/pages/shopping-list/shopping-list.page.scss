@@ -1,0 +1,112 @@
+/* Shopping List Page Styles - Light/Dark Mode Compatible */
+
+.shopping-list-card {
+  transition: all 0.3s ease;
+  // Usiamo solo variabili CSS per compatibilità light/dark mode
+  background-color: var(--p-card-background) !important;
+  border: 1px solid var(--card-border) !important;
+  
+  &:hover {
+    background-color: var(--card-hover) !important;
+    // transform: translateY(-2px);
+    box-shadow: var(--p-card-shadow);
+    border-color: var(--border) !important;
+  }
+  
+  // Assicuriamo che tutti i testi siano chiari
+  * {
+    color: var(--text-color) !important;
+  }
+  
+  // Eccezioni per elementi specifici
+  .shopping-list-quantity-badge {
+    color: var(--muted-foreground) !important;
+    background-color: var(--muted) !important;
+    border: 1px solid var(--border);
+  }
+}
+
+.shopping-list-item-name {
+  transition: color 0.2s ease;
+  color: var(--text-color) !important;
+  
+  &.line-through {
+    color: var(--muted-foreground) !important;
+  }
+}
+
+.shopping-list-quantity-badge {
+  transition: all 0.2s ease;
+}
+
+.shopping-list-edit-input {
+  transition: all 0.2s ease;
+  background-color: var(--input) !important;
+  border: 2px solid var(--border) !important;
+  color: var(--text-color) !important;
+  border-radius: 6px !important;
+  
+  &:hover {
+    border-color: var(--muted-foreground) !important;
+    background-color: var(--input) !important;
+    opacity: 0.9;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--accent-hover);
+    background-color: var(--input) !important;
+    opacity: 1;
+  }
+  
+  &::placeholder {
+    color: var(--muted-foreground) !important;
+    opacity: 0.7;
+  }
+}
+
+.shopping-list-edit-mode-bar {
+  transition: all 0.3s ease;
+}
+
+.shopping-list-empty-state {
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  
+  &:hover {
+    opacity: 1;
+  }
+}
+
+/* Stili per elementi acquistati */
+.shopping-list-item-bought {
+  background-color: var(--muted) !important;
+  border-color: var(--border) !important;
+  opacity: 0.7;
+  
+  &:hover {
+    background-color: var(--muted) !important;
+    opacity: 0.8;
+  }
+  
+  .shopping-list-item-name {
+    opacity: 0.8;
+  }
+  
+  .shopping-list-quantity-badge {
+    opacity: 0.7;
+    background-color: var(--background) !important;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .shopping-list-card {
+    padding: 0.75rem !important;
+  }
+  
+  .shopping-list-edit-input {
+    font-size: 0.875rem;
+  }
+}

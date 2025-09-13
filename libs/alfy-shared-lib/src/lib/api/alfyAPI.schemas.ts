@@ -5,13 +5,32 @@
  * The Alfy API documentation
  * OpenAPI spec version: 1.0
  */
+/**
+ * The unit of measurement for the item
+ */
+export type ShoppingListItemDTOUnit =
+  (typeof ShoppingListItemDTOUnit)[keyof typeof ShoppingListItemDTOUnit];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ShoppingListItemDTOUnit = {
+  pz: 'pz',
+  g: 'g',
+  hg: 'hg',
+  kg: 'kg',
+  ml: 'ml',
+  cl: 'cl',
+  l: 'l',
+} as const;
+
 export interface ShoppingListItemDTO {
   /** The name of the shopping item */
   name: string;
-  /** Whether the item has been bought */
-  bought: boolean;
   /** The quantity of the item */
   quantity: number;
+  /** The unit of measurement for the item */
+  unit: ShoppingListItemDTOUnit;
+  /** Whether the item has been bought */
+  bought: boolean;
 }
 
 export interface CreateShoppingListDTO {
@@ -23,13 +42,32 @@ export interface CreateShoppingListDTO {
   list: ShoppingListItemDTO[];
 }
 
+/**
+ * The unit of measurement for the item
+ */
+export type ShoppingListItemEntityUnit =
+  (typeof ShoppingListItemEntityUnit)[keyof typeof ShoppingListItemEntityUnit];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ShoppingListItemEntityUnit = {
+  pz: 'pz',
+  g: 'g',
+  hg: 'hg',
+  kg: 'kg',
+  ml: 'ml',
+  cl: 'cl',
+  l: 'l',
+} as const;
+
 export interface ShoppingListItemEntity {
   /** The unique identifier of the item */
-  id: string;
+  _id: string;
   /** The name of the shopping item */
   name: string;
   /** The quantity of the item */
   quantity: number;
+  /** The unit of measurement for the item */
+  unit: ShoppingListItemEntityUnit;
   /** Whether the item has been bought */
   bought: boolean;
 }
@@ -49,6 +87,28 @@ export interface ShoppingList {
   updatedAt: string;
 }
 
+export interface ShoppingListResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: ShoppingList;
+  /** Error message if request failed */
+  error?: string;
+}
+
+export interface ShoppingListArrayResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: ShoppingList[];
+  /** Error message if request failed */
+  error?: string;
+}
+
 export interface UpdateShoppingListDto {
   /** The name of the shopping list */
   name?: string;
@@ -56,4 +116,46 @@ export interface UpdateShoppingListDto {
   bought?: boolean;
   /** The list of items in the shopping list */
   list?: ShoppingListItemDTO[];
+}
+
+/**
+ * The unit of measurement for the item
+ */
+export type UpdateShoppingListItemDtoUnit =
+  (typeof UpdateShoppingListItemDtoUnit)[keyof typeof UpdateShoppingListItemDtoUnit];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateShoppingListItemDtoUnit = {
+  pz: 'pz',
+  g: 'g',
+  hg: 'hg',
+  kg: 'kg',
+  ml: 'ml',
+  cl: 'cl',
+  l: 'l',
+} as const;
+
+export interface UpdateShoppingListItemDto {
+  /** The name of the shopping item */
+  name?: string;
+  /** The quantity of the item */
+  quantity?: number;
+  /** The unit of measurement for the item */
+  unit?: UpdateShoppingListItemDtoUnit;
+  /** Whether the item has been bought */
+  bought?: boolean;
+}
+
+export interface DeleteResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /**
+   * The actual data payload
+   * @nullable
+   */
+  data?: string;
+  /** Error message if request failed */
+  error?: string;
 }

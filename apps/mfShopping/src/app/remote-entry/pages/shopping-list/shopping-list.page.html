@@ -1,0 +1,170 @@
+<div class="p-3">
+  <app-option-bar 
+    [options]="optionsBar()" 
+    (addItem)="onOpenaddItem()"
+    (toggleEdit)="onToggleEditMode()"
+    (goBack)="onGoBack()"
+  />
+  
+  <!-- Barra azioni selezione multipla (solo in modalità modifica) -->
+  @if(editMode() && selectedItems().length > 0) {
+    <div class="shopping-list-edit-mode-bar flex gap-2 mb-3 p-3 rounded" style="background-color: var(--muted); border: 1px solid var(--border);">
+      <p-button 
+        label="Elimina selezionati" 
+        icon="pi pi-trash" 
+        severity="danger" 
+        size="small"
+        (click)="onDeleteSelected()"
+      />
+      <span class="text-sm ml-auto flex items-center" style="color: var(--muted-foreground);">
+        {{selectedItems().length}} elemento{{selectedItems().length !== 1 ? 'i' : ''}} selezionato{{selectedItems().length !== 1 ? 'i' : ''}}
+      </span>
+    </div>
+  }
+
+  <div class="relative">
+    @if(loading()) {
+      <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center" style="z-index: 1000;">
+        <p-progress-spinner strokeWidth="8" fill="transparent" animationDuration=".5s" [style]="{ width: '50px', height: '100%' }" />
+      </div>
+    }
+    <div class="space-y-2">
+      @for (product of items(); track product._id) {
+        <div class="shopping-list-card flex items-center p-4 rounded-lg shadow-sm" [class.shopping-list-item-bought]="product.bought">
+          
+          <!-- Checkbox per selezione (solo in modalità modifica e solo per prodotti non acquistati) -->
+<!--           @if(editMode()) {
+            <div class="mr-3">
+              <p-checkbox 
+                [binary]="true" 
+                [ngModel]="isItemSelected(product)"
+                [disabled]="product.bought"
+                (onChange)="onItemSelect(product)"
+                [pTooltip]="product.bought ? 'Non puoi selezionare un prodotto già acquistato' : ''"
+              />
+            </div>
+          } -->
+          
+          <!-- Contenuto principale dell'elemento -->
+          <div class="flex-1 flex items-center justify-between">
+            
+            <!-- Nome e quantità (modificabili se in editing) -->
+            <div class="flex-1">
+              @if(editingItem()?._id === product._id) {
+                <!-- Modalità editing inline -->
+                <div class="flex gap-2 items-center">
+                  <input 
+                    #nameInput 
+                    type="text" 
+                    [value]="product.name"
+                    class="shopping-list-edit-input px-3 py-2 text-sm flex-1"
+                    placeholder="Nome prodotto"
+                  />
+                  <input 
+                    #quantityInput 
+                    type="number" 
+                    [value]="product.quantity"
+                    class="shopping-list-edit-input px-3 py-2 text-sm w-24"
+                    placeholder="Qtà"
+                    min="1"
+                  />
+                  <select 
+                    #unitInput 
+                    [value]="product.unit"
+                    class="shopping-list-edit-input px-3 py-2 text-sm w-20"
+                  >
+                    @for (unit of units(); track unit) {
+                      <option [value]="unit">{{unit}}</option>
+                    }
+                  </select>
+                  <div class="flex gap-1">
+                    <p-button 
+                      icon="pi pi-check" 
+                      size="small" 
+                      severity="success"
+                      (click)="onSaveItem(product, nameInput.value, +quantityInput.value, unitInput.value)"
+                    />
+                    <p-button 
+                      icon="pi pi-times" 
+                      size="small" 
+                      severity="secondary"
+                      (click)="onCancelEdit()"
+                    />
+                  </div>
+                </div>
+              } @else {
+                <!-- Visualizzazione normale -->
+                <div class="flex items-center gap-3">
+                  <span class="shopping-list-item-name font-medium" [class.line-through]="product.bought" [style.color]="product.bought ? 'var(--muted-foreground)' : 'var(--text-color)'">
+                    {{product.name}}
+                  </span>
+                  <span class="shopping-list-quantity-badge text-sm px-2 py-1 rounded-full" style="color: var(--muted-foreground); background-color: var(--muted);">
+                    {{product.quantity}} {{product.unit}}
+                  </span>
+                </div>
+              }
+            </div>
+            
+            <!-- Azioni -->
+            <div class="flex items-center gap-2 ml-4">
+              
+              <!-- Bottone Acquistato/Da Acquistare (solo in modalità visualizzazione) -->
+              @if(!editMode() && editingItem()?._id !== product._id) {
+                <p-button 
+                  [icon]="product.bought ? 'pi pi-check' : 'pi pi-shopping-cart'"
+                  [severity]="product.bought ? 'success' : 'info'"
+                  [pTooltip]="product.bought ? 'Segna come Non Acquistato' : 'Segna come Acquistato'"
+                  size="small"
+                  (click)="onToggleBought(product)"
+                />
+              }
+              
+              <!-- Azioni di modifica (solo in modalità modifica e se non in editing) -->
+              @if(editMode() && editingItem()?._id !== product._id) {
+                <p-button 
+                  icon="pi pi-pencil" 
+                  size="small" 
+                  severity="info"
+                  (click)="onEditItem(product)"
+                  pTooltip="Modifica elemento"
+                />
+                <p-button 
+                  icon="pi pi-trash" 
+                  size="small" 
+                  [severity]="product.bought ? 'secondary' : 'danger'"
+                  [disabled]="product.bought"
+                  (click)="onDeleteItem(product)"
+                  [pTooltip]="product.bought ? 'Non puoi eliminare un prodotto già acquistato' : 'Elimina elemento'"
+                />
+              }
+              
+            </div>
+          </div>
+        </div>
+      }
+      
+      @if(items().length === 0) {
+        <div class="shopping-list-empty-state text-center py-8" style="color: var(--muted-foreground);">
+          <i class="pi pi-shopping-cart text-4xl mb-4 block"></i>
+          <p>Nessun elemento nella lista della spesa</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <p-dialog
+    header="Header"
+    [modal]="true"
+    [(visible)]="visible"
+    [style]="{ width: '50rem' }"
+  >
+    <form [formGroup]="addItemForm">
+      <div class="flex flex-column gap-2">
+        <input type="text" label="Nome" formControlName="elementName" />
+        <p-inputNumber label="Quantità" formControlName="elementQuantity" />
+        <p-select label="Unità" formControlName="elementUnit" [options]="units()" />
+      </div>
+      <p-button label="Aggiungi" (click)="onAddItem()" />
+    </form>
+  </p-dialog>
+</div>

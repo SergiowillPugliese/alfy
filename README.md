@@ -2,7 +2,7 @@
 
 ## 🎯 Vision & Concetto
 
-**Alfy** è un'applicazione mobile per la gestione completa della vita domestica e familiare. L'obiettivo è centralizzare tutte le attività quotidiane di una famiglia in un'unica app intuitiva e moderna.
+**Alfy** è un'applicazione per la gestione completa della vita domestica e familiare. L'obiettivo è centralizzare tutte le attività quotidiane di una famiglia in un'unica app intuitiva e moderna.
 
 ### 🎪 Il Nome
 "Alfy" deriva da "Alfred", il maggiordomo di Batman - rappresenta l'assistente digitale perfetto che si prende cura di tutti i dettagli della gestione domestica.
@@ -60,50 +60,120 @@
 
 ## 🏗️ Architettura Tecnica
 
-### **Frontend (Angular/Ionic)**
+### **Architettura Monorepo con Nx**
+Il progetto utilizza **Nx Workspace** per gestire un monorepo con architettura a microfrontend:
+
 ```
-src/
-├── app/
-│   ├── core/
-│   │   ├── domains/           # Entità business
-│   │   │   ├── user/
-│   │   │   ├── family/
-│   │   │   ├── shopping-list/
-│   │   │   ├── calendar/
-│   │   │   ├── expenses/
-│   │   │   └── notifications/
-│   │   └── applications/      # Use Cases
-│   │       ├── auth-use-case/
-│   │       ├── shopping-list-use-case/
-│   │       ├── calendar-use-case/
-│   │       └── expense-use-case/
-│   ├── infrastructure/        # Repository implementations
-│   │   ├── auth-repository/
-│   │   ├── shopping-repository/
-│   │   └── expense-repository/
-│   └── features/             # UI Components & Pages
-│       ├── auth/
-│       ├── dashboard/
-│       ├── shopping-list/
-│       ├── calendar/
-│       ├── expenses/
-│       └── shared/
+alfy/
+├── apps/
+│   ├── alfy-fe/          # Shell principale (Angular)
+│   ├── mfShopping/       # Microfrontend Shopping Lists
+│   ├── alfy-be/          # Backend API (NestJS)
+│   └── alfy-be-e2e/      # Test E2E backend
+├── libs/
+│   └── alfy-shared-lib/  # Libreria condivisa
+└── dist/                 # Build artifacts
 ```
 
 ### **Patterns Architetturali**
+- **Microfrontend Architecture**: Applicazioni modulari e indipendenti
+- **Module Federation**: Sharing di codice tra microfrontend
 - **Clean Architecture**: Separazione domini, use case, infrastructure
 - **Angular Signals**: State management reattivo
-- **Standalone Components**: Approccio moderno Angular 19
+- **Standalone Components**: Approccio moderno Angular
 - **Repository Pattern**: Astrazione data access
-- **Dependency Injection**: IoC container Angular
+- **Dependency Injection**: IoC container Angular e NestJS
 
 ### **Tech Stack**
-- **Frontend**: Angular 19, Ionic 8, Capacitor
+
+#### **Frontend**
+- **Framework**: Angular 20+ con Standalone Components
+- **Architettura**: Microfrontend con Module Federation
 - **State Management**: Angular Signals + RxJS
-- **Styling**: Tailwind CSS + Ionic Components
+- **Styling**: PrimeNG
 - **Forms**: Reactive Forms
-- **Testing**: Jest + Cypress
-- **Build**: Angular CLI + Vite
+- **Build**: Webpack con Module Federation
+- **Monorepo**: Nx Workspace
+
+#### **Backend** 
+- **Framework**: NestJS con TypeScript
+- **Architecture**: Modular con Clean Architecture
+- **Database**: TypeORM (configurabile)
+- **API**: RESTful con OpenAPI/Swagger
+- **Validation**: Class Validator + Class Transformer
+- **Testing**: Jest
+
+#### **Shared**
+- **Library**: Nx shared library per tipi, servizi e componenti comuni
+- **API Client**: Generato automaticamente con Orval da OpenAPI
+- **Interceptors**: Gestione errori e autenticazione centralizzata
+
+#### **DevOps & Tooling**
+- **Monorepo**: Nx 21.3.6 con npm
+- **Testing**: Jest + Testing Library
+- **Linting**: ESLint con configurazioni condivise
+- **Build**: Nx build system con caching
+- **Code Generation**: Nx generators per consistenza
+
+### **Struttura Applicazioni**
+
+#### **alfy-fe (Shell Application)**
+- **Ruolo**: Application shell principale che orchestrا i microfrontend
+- **Responsabilità**: Routing, layout comune, autenticazione
+- **Tecnologie**: Angular + Module Federation
+
+#### **mfShopping (Microfrontend)**
+- **Ruolo**: Gestione completa delle liste della spesa
+- **Features**: CRUD liste, gestione articoli, interfaccia shopping
+- **Esposizione**: Moduli e route esportati via Module Federation
+
+#### **alfy-be (Backend API)**
+- **Ruolo**: API REST per tutti i servizi
+- **Architettura**: NestJS con moduli per dominio (shopping-list, etc.)
+- **Features**: CRUD operations, validazione, documentazione OpenAPI
+
+#### **alfy-shared-lib (Shared Library)**
+- **Ruolo**: Codice condiviso tra applicazioni
+- **Contenuto**: 
+  - Servizi API generati automaticamente
+  - Componenti UI comuni
+  - Interceptors e utilities
+  - Tipi TypeScript condivisi
+
+### **Comandi di Sviluppo**
+
+```bash
+# Installazione dipendenze
+npm install
+
+# Sviluppo (tutti i servizi in parallelo)
+npm run start:all
+
+# Sviluppo singole applicazioni
+nx serve alfy-fe          # Frontend shell
+nx serve mfShopping       # Microfrontend shopping
+nx serve alfy-be          # Backend API
+
+# Build
+nx build alfy-fe --prod   # Build produzione frontend
+nx build alfy-be --prod   # Build produzione backend
+nx build alfy-shared-lib  # Build libreria condivisa
+
+# Testing
+nx test alfy-fe           # Test frontend
+nx test alfy-be           # Test backend
+nx e2e alfy-be-e2e        # Test E2E
+
+# Linting
+nx lint alfy-fe           # Lint frontend
+nx lint alfy-be           # Lint backend
+
+# Generazione API client (da OpenAPI)
+npm run generate:api      # Rigenera client da schema OpenAPI
+
+# Visualizzazione dependency graph
+nx graph                  # Mostra grafo delle dipendenze
+```
 
 ## 📱 User Experience
 
@@ -146,12 +216,22 @@ src/
 
 ## 🚀 Roadmap di Sviluppo
 
-### **Phase 1: Foundation (Q1 2024)**
+### **Phase 0: Architettura & Foundation (✅ Completato)**
+- [x] Setup Nx monorepo workspace
+- [x] Architettura microfrontend con Module Federation
+- [x] Backend NestJS con architettura modulare
+- [x] Shared library per codice comune
+- [x] Sistema build e development workflow
+- [x] Generazione automatica API client da OpenAPI
+
+### **Phase 1: Shopping Lists Core (✅ In Corso)**
+- [x] CRUD shopping lists (Backend API)
+- [x] Interfaccia gestione liste (Frontend)
+- [x] Gestione articoli con unità di misura
+- [ ] Ottimizzazione UX e responsive design
 - [ ] Sistema autenticazione (JWT)
 - [ ] Gestione profili utente
-- [ ] Creazione/gestione famiglie
-- [ ] Guards & routing protetto
-- [ ] Refactor shopping-list per multi-user
+- [ ] Refactor per supporto multi-user
 
 ### **Phase 2: Calendar & Notifications (Q2 2024)**
 - [ ] Gestione appuntamenti personali/familiari
@@ -232,5 +312,17 @@ src/
 
 ---
 
-*Ultimo aggiornamento: Gennaio 2025*
-*Versione documento: 1.0* 
+## 🛠️ Stato Attuale del Progetto
+
+**Architettura**: ✅ Nx Monorepo con Microfrontend  
+**Backend**: ✅ NestJS con moduli shopping-list  
+**Frontend**: ✅ Angular Shell + Microfrontend Shopping  
+**Shared Library**: ✅ API client e componenti comuni  
+**Development Workflow**: ✅ Completamente funzionante  
+
+Il progetto ha migrato con successo da Ionic a un'architettura moderna basata su **Nx workspace** con **microfrontend Angular** e **backend NestJS**. La struttura attuale permette scalabilità, manutenibilità e sviluppo parallelo di features indipendenti.
+
+---
+
+*Ultimo aggiornamento: 12 Settembre 2025*  
+*Versione documento: 2.0 - Architettura Nx* 

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule } from "@angular/common";
+import { Component } from "@angular/core";
+
 
 @Component({
   selector: 'app-dashboard',
@@ -7,4 +8,6 @@ import { CommonModule } from '@angular/common';
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.scss',
 })
-export class DashboardPage {}
+export class DashboardPage {
+  
+}
