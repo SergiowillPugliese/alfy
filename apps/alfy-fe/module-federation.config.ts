@@ -14,16 +14,22 @@ const config: ModuleFederationConfig = {
    * declare module 'my-external-remote';
    *
    */
-  remotes: [['mfShopping', 'http://localhost:4201']],
+  remotes: process.env['NODE_ENV'] === 'development' 
+    ? [['mfShopping', 'http://localhost:4201'], ['mfExpenses', 'http://localhost:4202']]
+    : ['mfShopping', 'mfExpenses'],
   shared: (libraryName, defaultConfig) => {
-    if (libraryName === '@angular/core' || 
-        libraryName === '@angular/common' || 
-        libraryName === '@angular/router') {
+    if (
+      libraryName === '@angular/core' ||
+      libraryName === '@angular/common' ||
+      libraryName === '@angular/router'
+    ) {
       return { singleton: true, strictVersion: true };
     }
-    if (libraryName === 'primeng' || 
-        libraryName === 'primeflex' || 
-        libraryName === 'primeicons') {
+    if (
+      libraryName === 'primeng' ||
+      libraryName === 'primeflex' ||
+      libraryName === 'primeicons'
+    ) {
       return { singleton: true, strictVersion: false };
     }
     return defaultConfig;

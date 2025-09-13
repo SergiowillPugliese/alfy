@@ -18,10 +18,19 @@ export const appRoutes: Route[] = [
   {
     path: 'mfShopping',
     data: {
-      title: 'Shopping',
+      title: 'Lista della spesa',
       icon: 'pi pi-shopping-bag',
     },
     loadChildren: () =>
       import('mfShopping/Routes').then((m) => m!.remoteRoutes),
+  },
+  {
+    path: 'mfExpenses',
+    data: {
+      title: 'Gestione contabilità',
+      icon: 'pi pi-money-bill',
+    },
+    loadChildren: () =>
+      import('mfExpenses/Routes').then((m) => m!.remoteRoutes),
   },
 ];
