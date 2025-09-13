@@ -1,6 +1,6 @@
 <div class="flex align-items-center justify-content-between pb-3">
   <div class="flex gap-2">
-    <p-button class="go-back-button" icon="pi pi-arrow-left" />
+    <p-button (click)="onGoBack()" class="go-back-button" icon="pi pi-arrow-left" />
   </div>
   <div class="flex justify-center">
     @if(options()?.editButton) {

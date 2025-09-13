@@ -22,7 +22,7 @@ export class ShoppingPage {
     this._loadLists();
   }
 
-  navigateTo(item: ShoppingList) {
+  protected navigateTo(item: ShoppingList) {
     this._router.navigate(['/mfShopping', item._id, item.name]);
   }
 

@@ -24,13 +24,18 @@ export class OptionBarComponent {
     options = input<Options>();
     addItem = output<void>();
     toggleEdit = output<void>();
+    goBack = output<void>();
 
-    onAddItem() {
+    protected onAddItem() {
         this.addItem.emit();
     }
 
-    onToggleEdit() {
+    protected onToggleEdit() {
         this.toggleEdit.emit();
+    }
+
+    protected onGoBack() {
+        this.goBack.emit();
     }
 
 }

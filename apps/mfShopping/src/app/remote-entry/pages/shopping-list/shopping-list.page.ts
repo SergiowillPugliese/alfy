@@ -28,11 +28,13 @@ import {
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { SelectModule } from 'primeng/select';
+import { firstValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-shopping-list',
@@ -59,7 +61,8 @@ export class ShoppingListPage implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _toast = inject(ToastService);
   private readonly _destroyRef = inject(DestroyRef);
-
+  protected readonly _router = inject(Router);
+  
   optionsBar = signal<Options>({
     addButton: true,
     addButtonLabel: 'Aggiungi elemento',
@@ -90,12 +93,12 @@ export class ShoppingListPage implements OnInit {
     }
   }
 
-  onOpenaddItem() {
+  protected onOpenaddItem() {
     console.log('addItem');
     this.visible.set(true);
   }
 
-  onAddItem() {
+  protected onAddItem() {
     this.loading.set(true);
     const unit = this.addItemForm.value.elementUnit as ShoppingListItemDTOUnit;
     const item: ShoppingListItemDTO = {
@@ -129,7 +132,7 @@ export class ShoppingListPage implements OnInit {
       });
   }
 
-  onToggleBought(product: ShoppingListItemEntity) {
+  protected onToggleBought(product: ShoppingListItemEntity) {
     this.loading.set(true);
     
     // Invertiamo lo stato prima di inviare la richiesta
@@ -164,7 +167,7 @@ export class ShoppingListPage implements OnInit {
       });
   }
 
-  onDeleteItem(product: ShoppingListItemEntity) {
+  protected onDeleteItem(product: ShoppingListItemEntity) {
     // Controllo: non permettere eliminazione di prodotti acquistati
     if (product.bought) {
       this._toast.showErrorMessage({
@@ -193,7 +196,7 @@ export class ShoppingListPage implements OnInit {
       });
   }
 
-  onToggleEditMode() {
+  protected onToggleEditMode() {
     const newEditMode = !this.editMode();
     this.editMode.set(newEditMode);
     
@@ -209,11 +212,11 @@ export class ShoppingListPage implements OnInit {
     }
   }
 
-  onEditItem(product: ShoppingListItemEntity) {
+  protected onEditItem(product: ShoppingListItemEntity) {
     this.editingItem.set(product);
   }
 
-  onSaveItem(product: ShoppingListItemEntity, newName: string, newQuantity: number, newUnit: string) {
+  protected onSaveItem(product: ShoppingListItemEntity, newName: string, newQuantity: number, newUnit: string) {
     this.loading.set(true);
     const unit = newUnit as ShoppingListItemDTOUnit;
     this._shoppingService.shoppingListControllerUpdateItem(this.id, product._id, {
@@ -233,11 +236,11 @@ export class ShoppingListPage implements OnInit {
     });
   }
 
-  onCancelEdit() {
+  protected onCancelEdit() {
     this.editingItem.set(null);
   }
 
-  onSelectAll() {
+  protected onSelectAll() {
     // Filtra solo i prodotti non acquistati per la selezione
     const selectableItems = this.items().filter(item => !item.bought);
     
@@ -250,7 +253,7 @@ export class ShoppingListPage implements OnInit {
     }
   }
 
-  onItemSelect(product: ShoppingListItemEntity) {
+  protected onItemSelect(product: ShoppingListItemEntity) {
     // Non permettere selezione di prodotti acquistati
     if (product.bought) {
       return;
@@ -268,21 +271,21 @@ export class ShoppingListPage implements OnInit {
     }
   }
 
-  isItemSelected(product: ShoppingListItemEntity): boolean {
+  protected isItemSelected(product: ShoppingListItemEntity): boolean {
     return this.selectedItems().some(item => item._id === product._id);
   }
 
-  isAllSelected(): boolean {
+  protected isAllSelected(): boolean {
     const selectableItems = this.items().filter(item => !item.bought);
     return selectableItems.length > 0 && this.selectedItems().length === selectableItems.length;
   }
 
-  isPartialSelected(): boolean {
+  protected isPartialSelected(): boolean {
     const selectableItems = this.items().filter(item => !item.bought);
     return this.selectedItems().length > 0 && this.selectedItems().length < selectableItems.length;
   }
 
-  onDeleteSelected() {
+  protected onDeleteSelected() {
     if (this.selectedItems().length === 0) {
       this._toast.showErrorMessage({
         severity: 'warn',
@@ -298,7 +301,7 @@ export class ShoppingListPage implements OnInit {
     
     // Elimina tutti gli elementi selezionati uno per uno
     const deletePromises = selectedIds.map(id => 
-      this._shoppingService.shoppingListControllerRemoveItem(this.id, id).toPromise()
+      firstValueFrom(this._shoppingService.shoppingListControllerRemoveItem(this.id, id))
     );
 
     Promise.all(deletePromises)
@@ -320,7 +323,7 @@ export class ShoppingListPage implements OnInit {
       });
   }
 
-  onMarkSelectedAsBought() {
+  protected onMarkSelectedAsBought() {
     if (this.selectedItems().length === 0) {
       this._toast.showErrorMessage({
         severity: 'warn',
@@ -336,9 +339,9 @@ export class ShoppingListPage implements OnInit {
     
     // Marca tutti gli elementi selezionati come acquistati
     const updatePromises = selectedItems.map(item => 
-      this._shoppingService.shoppingListControllerUpdateItem(this.id, item._id, {
+      firstValueFrom(this._shoppingService.shoppingListControllerUpdateItem(this.id, item._id, {
         bought: true
-      }).toPromise()
+      }))
     );
 
     Promise.all(updatePromises)
@@ -358,6 +361,10 @@ export class ShoppingListPage implements OnInit {
       .finally(() => {
         this.loading.set(false);
       });
+  }
+
+  protected onGoBack() {
+    this._router.navigate(['/mfShopping'], { relativeTo: this._route })
   }
 
   private _loadItems(id: string) {
