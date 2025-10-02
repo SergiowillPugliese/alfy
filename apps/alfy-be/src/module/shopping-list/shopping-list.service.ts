@@ -1,25 +1,48 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, ForbiddenException } from '@nestjs/common';
 import { CreateShoppingListDTO } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
 import { UpdateShoppingListItemDto } from './dto/update-shopping-list-item.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ShoppingList } from './entities/shopping-list.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { BaseResponseDto } from '../../common/dto/baseResponce.dto';
+import { ResourceSharingService } from '../../common/services/resource-sharing.service';
+import { SharingLevel } from '../../common/enums/roles.enum';
 
 @Injectable()
 export class ShoppingListService {
   constructor(
     @InjectModel(ShoppingList.name)
     private shoppingListModel: Model<ShoppingList>,
+    private resourceSharingService: ResourceSharingService,
   ) {}
 
   async create(
     createShoppingListDto: CreateShoppingListDTO,
+    userId: string,
+    familyId: string,
+    sharingLevel: SharingLevel = SharingLevel.PRIVATE,
+    sharedWithUsers: string[] = []
   ): Promise<BaseResponseDto<ShoppingList | null>> {
     try {
-      const shoppingList = new this.shoppingListModel(createShoppingListDto);
+      const shoppingListData = {
+        ...createShoppingListDto,
+        ownerId: new Types.ObjectId(userId),
+        familyId: new Types.ObjectId(familyId),
+      };
+
+      const shoppingList = new this.shoppingListModel(shoppingListData);
       const savedShoppingList = await shoppingList.save();
+
+      // Create resource sharing entry
+      await this.resourceSharingService.createResourceSharing(
+        savedShoppingList._id.toString(),
+        'shopping-list',
+        userId,
+        familyId,
+        sharingLevel,
+        sharedWithUsers
+      );
 
       return {
         success: true,
@@ -27,34 +50,42 @@ export class ShoppingListService {
         data: savedShoppingList,
       };
     } catch (error) {
-      // Se l'errore è un problema di validazione o altro, lancia un'eccezione esplicita
       console.error('Error creating shopping list:', error);
 
-      // Usa HttpException per restituire un errore con codice HTTP 400 o 500
       throw new HttpException(
         {
           success: false,
           message: 'Shopping list creation failed. ' + error.message,
           data: null,
         },
-        HttpStatus.BAD_REQUEST, // O HTTP_STATUS.INTERNAL_SERVER_ERROR a seconda del caso
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
 
-  async findAll() {
+  async findAll(userId: string, familyId: string) {
     try {
-      const shoppingList = await this.shoppingListModel.find();
+      // Get accessible shopping list IDs for the user
+      const accessibleIds = await this.resourceSharingService.getAccessibleResources(
+        userId,
+        familyId,
+        'shopping-list'
+      );
+
+      const shoppingLists = await this.shoppingListModel.find({
+        _id: { $in: accessibleIds.map(id => new Types.ObjectId(id)) }
+      }).populate('ownerId', 'firstName lastName email');
+
       return {
         success: true,
-        message: 'Shopping list fetched successfully',
-        data: shoppingList,
+        message: 'Shopping lists fetched successfully',
+        data: shoppingLists,
       };
     } catch (error) {
       throw new HttpException(
         {
           success: false,
-          message: 'Shopping list fetching failed. ' + error.message,
+          message: 'Shopping lists fetching failed. ' + error.message,
           data: null,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -62,9 +93,21 @@ export class ShoppingListService {
     }
   }
 
-  async findOne(id: string): Promise<BaseResponseDto<ShoppingList | null>> {
+  async findOne(id: string, userId: string): Promise<BaseResponseDto<ShoppingList | null>> {
     try {
-      const shoppingList = await this.shoppingListModel.findById(id);
+      // Check if user can access this resource
+      const canAccess = await this.resourceSharingService.canUserAccessResource(
+        userId,
+        id,
+        'shopping-list'
+      );
+
+      if (!canAccess) {
+        throw new ForbiddenException('Access denied to this shopping list');
+      }
+
+      const shoppingList = await this.shoppingListModel.findById(id)
+        .populate('ownerId', 'firstName lastName email');
       
       if (!shoppingList) {
         throw new HttpException(
@@ -83,7 +126,7 @@ export class ShoppingListService {
         data: shoppingList,
       };
     } catch (error) {
-      if (error instanceof HttpException) {
+      if (error instanceof HttpException || error instanceof ForbiddenException) {
         throw error;
       }
       
@@ -98,8 +141,19 @@ export class ShoppingListService {
     }
   }
 
-  async update(id: string, updateShoppingListDto: UpdateShoppingListDto): Promise<BaseResponseDto<ShoppingList | null>> {
+  async update(id: string, updateShoppingListDto: UpdateShoppingListDto, userId: string): Promise<BaseResponseDto<ShoppingList | null>> {
     try {
+      // Check if user can access this resource
+      const canAccess = await this.resourceSharingService.canUserAccessResource(
+        userId,
+        id,
+        'shopping-list'
+      );
+
+      if (!canAccess) {
+        throw new ForbiddenException('Access denied to this shopping list');
+      }
+
       const updatedShoppingList = await this.shoppingListModel.findByIdAndUpdate(
         id,
         updateShoppingListDto,
@@ -123,7 +177,7 @@ export class ShoppingListService {
         data: updatedShoppingList,
       };
     } catch (error) {
-      if (error instanceof HttpException) {
+      if (error instanceof HttpException || error instanceof ForbiddenException) {
         throw error;
       }
       
@@ -139,8 +193,19 @@ export class ShoppingListService {
   }
 
   //metodo che aggiorna il singolo item e lo setta come acquistato o non acquistato quando dal frontend viene cliccato il checkbox
-  async updateItem(id: string, itemId: string, updateItemDto: UpdateShoppingListItemDto): Promise<BaseResponseDto<ShoppingList | null>> {
+  async updateItem(id: string, itemId: string, updateItemDto: UpdateShoppingListItemDto, userId: string): Promise<BaseResponseDto<ShoppingList | null>> {
     try {
+      // Check if user can access this resource
+      const canAccess = await this.resourceSharingService.canUserAccessResource(
+        userId,
+        id,
+        'shopping-list'
+      );
+
+      if (!canAccess) {
+        throw new ForbiddenException('Access denied to this shopping list');
+      }
+
       // Trova la shopping list
       const shoppingList = await this.shoppingListModel.findById(id);
       if (!shoppingList) {
@@ -197,8 +262,19 @@ export class ShoppingListService {
     }
   }
 
-  async removeItem(id: string, itemId: string): Promise<BaseResponseDto<null>> {
+  async removeItem(id: string, itemId: string, userId: string): Promise<BaseResponseDto<null>> {
     try {
+      // Check if user can access this resource
+      const canAccess = await this.resourceSharingService.canUserAccessResource(
+        userId,
+        id,
+        'shopping-list'
+      );
+
+      if (!canAccess) {
+        throw new ForbiddenException('Access denied to this shopping list');
+      }
+
       const shoppingList = await this.shoppingListModel.findById(id);
       if (!shoppingList) {
         throw new HttpException(
@@ -254,11 +330,11 @@ export class ShoppingListService {
     }
   }
 
-  async remove(id: string): Promise<BaseResponseDto<null>> {
+  async remove(id: string, userId: string): Promise<BaseResponseDto<null>> {
     try {
-      const deletedShoppingList = await this.shoppingListModel.findByIdAndDelete(id);
-
-      if (!deletedShoppingList) {
+      // Check if user is the owner of this resource (only owner can delete)
+      const shoppingList = await this.shoppingListModel.findById(id);
+      if (!shoppingList) {
         throw new HttpException(
           {
             success: false,
@@ -268,6 +344,15 @@ export class ShoppingListService {
           HttpStatus.NOT_FOUND,
         );
       }
+
+      if (shoppingList.ownerId.toString() !== userId) {
+        throw new ForbiddenException('Only the owner can delete this shopping list');
+      }
+
+      await this.shoppingListModel.findByIdAndDelete(id);
+
+      // Also delete the resource sharing entry
+      await this.resourceSharingService.deleteResourceSharing(id, 'shopping-list', userId);
 
       return {
         success: true,

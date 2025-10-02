@@ -5,6 +5,85 @@
  * The Alfy API documentation
  * OpenAPI spec version: 1.0
  */
+export interface RegisterDto {
+  email: string;
+  /** @minLength 6 */
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface UserProfileDto {
+  /** User ID */
+  id: string;
+  /** User email */
+  email: string;
+  /** User first name */
+  firstName: string;
+  /** User last name */
+  lastName: string;
+  /** User creation date */
+  createdAt: string;
+  /** User last update date */
+  updatedAt: string;
+}
+
+export interface AuthTokensDto {
+  /** JWT access token */
+  access_token: string;
+  /** JWT refresh token */
+  refresh_token: string;
+  /** User profile information */
+  user: UserProfileDto;
+}
+
+export interface AuthResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: AuthTokensDto;
+  /** Error message if request failed */
+  error?: string;
+}
+
+export interface LoginDto {
+  email: string;
+  password: string;
+}
+
+export interface RefreshTokenDto {
+  refresh_token: string;
+}
+
+export interface LogoutMessageDto {
+  /** Logout message */
+  message: string;
+}
+
+export interface LogoutResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: LogoutMessageDto;
+  /** Error message if request failed */
+  error?: string;
+}
+
+export interface UserProfileResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: UserProfileDto;
+  /** Error message if request failed */
+  error?: string;
+}
+
 /**
  * The unit of measurement for the item
  */

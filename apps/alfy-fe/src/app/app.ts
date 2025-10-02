@@ -39,6 +39,6 @@ export class App {
       label: route.data?.['title'] || route.path,
       icon: route.data?.['icon'] || 'pi pi-home',
       routerLink: route.path,
-    })).filter((item) => item.label !== '');
+    })).filter((item) => item.label !== '' && item.label !== 'auth');
   }
 }

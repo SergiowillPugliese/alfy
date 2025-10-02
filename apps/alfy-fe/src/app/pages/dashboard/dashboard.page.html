@@ -1,1 +1,104 @@
-<p>dashboard works!</p>
+<div class="p-4 max-w-7xl mx-auto">
+  <!-- Header -->
+  <p-card class="mb-4" styleClass="shadow-2">
+    <div class="flex justify-content-between align-items-center">
+      <div>
+        <h1 class="text-4xl font-bold text-900 mb-2">Benvenuto in Alfy!</h1>
+        <p *ngIf="currentUser" class="text-600 text-lg mb-0">
+          Ciao, {{ currentUser.firstName }} {{ currentUser.lastName }}!
+        </p>
+      </div>
+      
+      <div class="flex align-items-center gap-3">
+        <div *ngIf="currentUser" class="flex align-items-center gap-3">
+          <p-avatar 
+            [label]="currentUser.firstName.charAt(0) + currentUser.lastName.charAt(0)"
+            size="large"
+            styleClass="bg-primary text-white"
+          />
+          <div class="hidden md:block">
+            <div class="font-semibold text-900">{{ currentUser.firstName }} {{ currentUser.lastName }}</div>
+            <div class="text-600 text-sm">{{ currentUser.email }}</div>
+          </div>
+        </div>
+        
+        <p-button
+          icon="pi pi-sign-out"
+          [label]="isLoading ? 'Disconnessione...' : 'Logout'"
+          [loading]="isLoading"
+          [disabled]="isLoading"
+          severity="danger"
+          (onClick)="onLogout()"
+        />
+      </div>
+    </div>
+  </p-card>
+
+  <!-- Content -->
+  <div class="grid">
+    <!-- Quick Actions -->
+    <div class="col-12 lg:col-8">
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <p-card styleClass="h-full shadow-2 hover:shadow-4 transition-all transition-duration-200 cursor-pointer">
+            <div class="flex align-items-center gap-4">
+              <p-avatar 
+                icon="pi pi-shopping-bag"
+                size="xlarge"
+                styleClass="bg-blue-500 text-white"
+              />
+              <div class="flex-1">
+                <h3 class="text-xl font-bold text-900 mb-2">Lista della Spesa</h3>
+                <p class="text-600 mb-3">Gestisci le tue liste della spesa</p>
+                <p-button 
+                  label="Vai alla lista"
+                  icon="pi pi-arrow-right"
+                  [routerLink]="['/mfShopping']"
+                  size="small"
+                />
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <p-card styleClass="h-full shadow-2 hover:shadow-4 transition-all transition-duration-200 cursor-pointer">
+            <div class="flex align-items-center gap-4">
+              <p-avatar 
+                icon="pi pi-money-bill"
+                size="xlarge"
+                styleClass="bg-green-500 text-white"
+              />
+              <div class="flex-1">
+                <h3 class="text-xl font-bold text-900 mb-2">Gestione Contabilità</h3>
+                <p class="text-600 mb-3">Tieni traccia delle tue spese</p>
+                <p-button 
+                  label="Vai alle spese"
+                  icon="pi pi-arrow-right"
+                  [routerLink]="['/mfExpenses']"
+                  size="small"
+                />
+              </div>
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-12 lg:col-4">
+      <p-card styleClass="h-full shadow-2">
+        <ng-template pTemplate="header">
+          <div class="px-3 pt-3">
+            <h2 class="text-xl font-bold text-900 mb-0">Attività Recente</h2>
+          </div>
+        </ng-template>
+        
+        <div class="text-center py-6">
+          <i class="pi pi-clock text-6xl text-400 mb-3"></i>
+          <p class="text-600 mb-0">Nessuna attività recente</p>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

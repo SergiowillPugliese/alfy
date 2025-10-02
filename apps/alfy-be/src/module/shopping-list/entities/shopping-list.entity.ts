@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export class ShoppingListItemEntity {
   @ApiProperty({
@@ -43,13 +43,13 @@ export interface ShoppingListItem {
   bought: boolean;
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class ShoppingList extends Document {
   @ApiProperty({
     description: 'The unique identifier of the shopping list',
     example: '507f1f77bcf86cd799439011',
   })
-  _id: string;
+  _id: Types.ObjectId;
 
   @ApiProperty({
     description: 'The name of the shopping list',
@@ -57,6 +57,20 @@ export class ShoppingList extends Document {
   })
   @Prop({ required: true })
   name: string;
+
+  @ApiProperty({
+    description: 'The ID of the user who created the shopping list',
+    example: '507f1f77bcf86cd799439012',
+  })
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  ownerId: Types.ObjectId;
+
+  @ApiProperty({
+    description: 'The ID of the family this shopping list belongs to',
+    example: '507f1f77bcf86cd799439013',
+  })
+  @Prop({ type: Types.ObjectId, ref: 'Family', required: true })
+  familyId: Types.ObjectId;
 
   @ApiProperty({
     description: 'Whether the shopping list is completed',
@@ -98,4 +112,8 @@ export class ShoppingList extends Document {
 }
 
 export const ShoppingListSchema = SchemaFactory.createForClass(ShoppingList);
-ShoppingListSchema.set('timestamps', true);
+
+// Add indexes for efficient queries
+ShoppingListSchema.index({ ownerId: 1 });
+ShoppingListSchema.index({ familyId: 1 });
+ShoppingListSchema.index({ familyId: 1, ownerId: 1 });

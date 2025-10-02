@@ -6,19 +6,26 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
+  Query,
 } from '@nestjs/common';
 import { ShoppingListService } from './shopping-list.service';
 import { CreateShoppingListDTO } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
 import { UpdateShoppingListItemDto } from './dto/update-shopping-list-item.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { 
   ShoppingListResponseDto, 
   ShoppingListArrayResponseDto, 
   DeleteResponseDto 
 } from './dto/shopping-list-response.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SharingLevel } from '../../common/enums/roles.enum';
 
 @ApiTags('Shopping List')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('shopping-list')
 export class ShoppingListController {
   constructor(private readonly shoppingListService: ShoppingListService) {}
@@ -34,8 +41,21 @@ export class ShoppingListController {
     description: 'Bad request - Invalid input data',
   })
   @Post()
-  create(@Body() createShoppingListDto: CreateShoppingListDTO) {
-    return this.shoppingListService.create(createShoppingListDto);
+  create(
+    @Body() createShoppingListDto: CreateShoppingListDTO,
+    @Request() req,
+    @Query('familyId') familyId: string,
+    @Query('sharingLevel') sharingLevel?: SharingLevel,
+    @Query('sharedWithUsers') sharedWithUsers?: string,
+  ) {
+    const sharedUsers = sharedWithUsers ? sharedWithUsers.split(',') : [];
+    return this.shoppingListService.create(
+      createShoppingListDto,
+      req.user.sub,
+      familyId,
+      sharingLevel || SharingLevel.PRIVATE,
+      sharedUsers
+    );
   }
 
   @ApiOperation({ summary: 'Get all shopping lists' })
@@ -45,8 +65,8 @@ export class ShoppingListController {
     type: ShoppingListArrayResponseDto,
   })
   @Get()
-  findAll() {
-    return this.shoppingListService.findAll();
+  findAll(@Request() req, @Query('familyId') familyId: string) {
+    return this.shoppingListService.findAll(req.user.sub, familyId);
   }
 
   @ApiOperation({ summary: 'Get a shopping list by id' })
@@ -60,8 +80,8 @@ export class ShoppingListController {
     description: 'Shopping list not found',
   })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.shoppingListService.findOne(id);
+  findOne(@Param('id') id: string, @Request() req) {
+    return this.shoppingListService.findOne(id, req.user.sub);
   }
 
   @ApiOperation({ summary: 'Update a shopping list by id' })
@@ -82,8 +102,9 @@ export class ShoppingListController {
   update(
     @Param('id') id: string,
     @Body() updateShoppingListDto: UpdateShoppingListDto,
+    @Request() req,
   ) {
-    return this.shoppingListService.update(id, updateShoppingListDto);
+    return this.shoppingListService.update(id, updateShoppingListDto, req.user.sub);
   }
 
   @ApiOperation({ summary: 'Update a specific item in a shopping list' })
@@ -105,8 +126,9 @@ export class ShoppingListController {
     @Param('id') id: string,
     @Param('itemId') itemId: string,
     @Body() updateItemDto: UpdateShoppingListItemDto,
+    @Request() req,
   ) {
-    return this.shoppingListService.updateItem(id, itemId, updateItemDto);
+    return this.shoppingListService.updateItem(id, itemId, updateItemDto, req.user.sub);
   }
 
   @ApiOperation({ summary: 'Delete a shopping list by id' })
@@ -120,8 +142,8 @@ export class ShoppingListController {
     description: 'Shopping list not found',
   })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.shoppingListService.remove(id);
+  remove(@Param('id') id: string, @Request() req) {
+    return this.shoppingListService.remove(id, req.user.sub);
   }
 
   @ApiOperation({ summary: 'Delete a specific item in a shopping list' })
@@ -135,7 +157,7 @@ export class ShoppingListController {
     description: 'Shopping list or item not found',
   })
   @Delete(':id/items/:itemId')
-  removeItem(@Param('id') id: string, @Param('itemId') itemId: string) {
-    return this.shoppingListService.removeItem(id, itemId);
+  removeItem(@Param('id') id: string, @Param('itemId') itemId: string, @Request() req) {
+    return this.shoppingListService.removeItem(id, itemId, req.user.sub);
   }
 }

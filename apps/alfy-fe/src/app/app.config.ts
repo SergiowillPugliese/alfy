@@ -9,7 +9,7 @@ import { appRoutes } from './app.routes';
 import { providePrimeNG } from 'primeng/config';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import Aura from '@primeuix/themes/lara';
-import { ErrorInterceptor } from '@alfy/alfy-shared-lib';
+import { ErrorInterceptor, authInterceptor } from '@alfy/alfy-shared-lib';
 import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
@@ -17,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes),
-    provideHttpClient(withInterceptors([ErrorInterceptor])),
+    provideHttpClient(withInterceptors([ErrorInterceptor, authInterceptor])),
     provideAnimationsAsync(),
     providePrimeNG({
         theme: {

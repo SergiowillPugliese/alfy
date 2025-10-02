@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+import { authGuard, noAuthGuard } from '@alfy/alfy-shared-lib';
 
 export const appRoutes: Route[] = [
   {
@@ -7,7 +8,14 @@ export const appRoutes: Route[] = [
     pathMatch: 'full',
   },
   {
+    path: 'auth',
+    canActivate: [noAuthGuard],
+    loadComponent: () =>
+      import('./pages/auth').then((m) => m.Auth),
+  },
+  {
     path: 'dashboard',
+    canActivate: [authGuard],
     data: {
       title: 'Dashboard',
       icon: 'pi pi-home',
@@ -17,6 +25,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'mfShopping',
+    canActivate: [authGuard],
     data: {
       title: 'Lista della spesa',
       icon: 'pi pi-shopping-bag',
@@ -26,6 +35,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'mfExpenses',
+    canActivate: [authGuard],
     data: {
       title: 'Gestione contabilità',
       icon: 'pi pi-money-bill',
