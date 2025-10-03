@@ -14,12 +14,13 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { FamilyService } from './family.service';
 import { ResourceSharingService } from '../../common/services/resource-sharing.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CreateFamilyDto, AddFamilyMemberDto, UpdateFamilyMemberDto } from './dto/create-family.dto';
+import { FamilyMembershipGuard, PreventSelfActionGuard } from '../../common/guards/family-membership.guard';
+import { AddFamilyMemberDto } from './dto/create-family.dto';
 import { UpdateSharingDto } from './dto/update-sharing.dto';
 import { BaseResponseDto } from '../../common/dto/baseResponce.dto';
 import { UserRole } from '../../common/enums/roles.enum';
 
-@ApiTags('family')
+@ApiTags('Family Management (Internal)')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('family')
@@ -29,26 +30,6 @@ export class FamilyController {
     private readonly resourceSharingService: ResourceSharingService,
   ) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new family' })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Family created successfully',
-    type: BaseResponseDto,
-  })
-  async createFamily(@Body() createFamilyDto: CreateFamilyDto, @Request() req) {
-    const family = await this.familyService.createFamily(
-      req.user.sub,
-      createFamilyDto.name,
-      createFamilyDto.description,
-    );
-
-    return new BaseResponseDto(
-      'Family created successfully',
-      family,
-      HttpStatus.CREATED,
-    );
-  }
 
   @Get('my-families')
   @ApiOperation({ summary: 'Get user families' })
@@ -60,10 +41,9 @@ export class FamilyController {
   async getUserFamilies(@Request() req) {
     const families = await this.familyService.getUserFamilies(req.user.sub);
 
-    return new BaseResponseDto(
-      'User families retrieved successfully',
+    return BaseResponseDto.success(
       families,
-      HttpStatus.OK,
+      'User families retrieved successfully',
     );
   }
 
@@ -78,19 +58,14 @@ export class FamilyController {
     // Check if user is member of the family
     const isMember = await this.familyService.isUserFamilyMember(req.user.sub, familyId);
     if (!isMember) {
-      return new BaseResponseDto(
-        'Access denied',
-        null,
-        HttpStatus.FORBIDDEN,
-      );
+      return BaseResponseDto.error('Access denied');
     }
 
     const members = await this.familyService.getFamilyMembers(familyId);
 
-    return new BaseResponseDto(
-      'Family members retrieved successfully',
+    return BaseResponseDto.success(
       members,
-      HttpStatus.OK,
+      'Family members retrieved successfully',
     );
   }
 
@@ -109,11 +84,7 @@ export class FamilyController {
     // Check if requester is admin
     const requesterRole = await this.familyService.getUserRoleInFamily(req.user.sub, familyId);
     if (requesterRole !== UserRole.ADMIN) {
-      return new BaseResponseDto(
-        'Only family admin can add members',
-        null,
-        HttpStatus.FORBIDDEN,
-      );
+      return BaseResponseDto.error('Only family admin can add members');
     }
 
     // Find user by email
@@ -121,14 +92,14 @@ export class FamilyController {
     // For now, we'll assume the email is actually a userId
     const member = await this.familyService.addFamilyMember(familyId, addMemberDto.email);
 
-    return new BaseResponseDto(
-      'Family member added successfully',
+    return BaseResponseDto.success(
       member,
-      HttpStatus.CREATED,
+      'Family member added successfully',
     );
   }
 
   @Put(':familyId/members/:userId/deactivate')
+  @UseGuards(FamilyMembershipGuard, PreventSelfActionGuard)
   @ApiOperation({ summary: 'Deactivate a family member' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -142,14 +113,14 @@ export class FamilyController {
   ) {
     await this.familyService.deactivateFamilyMember(familyId, userId, req.user.sub);
 
-    return new BaseResponseDto(
-      'Family member deactivated successfully',
+    return BaseResponseDto.success(
       null,
-      HttpStatus.OK,
+      'Family member deactivated successfully',
     );
   }
 
   @Put(':familyId/members/:userId/activate')
+  @UseGuards(FamilyMembershipGuard)
   @ApiOperation({ summary: 'Activate a family member' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -163,14 +134,14 @@ export class FamilyController {
   ) {
     await this.familyService.activateFamilyMember(familyId, userId, req.user.sub);
 
-    return new BaseResponseDto(
-      'Family member activated successfully',
+    return BaseResponseDto.success(
       null,
-      HttpStatus.OK,
+      'Family member activated successfully',
     );
   }
 
   @Delete(':familyId/members/:userId')
+  @UseGuards(FamilyMembershipGuard)
   @ApiOperation({ summary: 'Permanently delete a family member (sysadmin only)' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -184,10 +155,9 @@ export class FamilyController {
   ) {
     await this.familyService.deleteFamilyMember(familyId, userId, req.user.sub);
 
-    return new BaseResponseDto(
-      'Family member deleted successfully',
+    return BaseResponseDto.success(
       null,
-      HttpStatus.OK,
+      'Family member deleted successfully',
     );
   }
 
@@ -212,10 +182,9 @@ export class FamilyController {
       req.user.sub,
     );
 
-    return new BaseResponseDto(
-      'Resource sharing updated successfully',
+    return BaseResponseDto.success(
       resourceSharing,
-      HttpStatus.OK,
+      'Resource sharing updated successfully',
     );
   }
 
@@ -239,11 +208,7 @@ export class FamilyController {
     );
 
     if (!canAccess) {
-      return new BaseResponseDto(
-        'Access denied',
-        null,
-        HttpStatus.FORBIDDEN,
-      );
+      return BaseResponseDto.error('Access denied');
     }
 
     const resourceSharing = await this.resourceSharingService.getResourceSharing(
@@ -251,10 +216,9 @@ export class FamilyController {
       resourceType,
     );
 
-    return new BaseResponseDto(
-      'Resource sharing retrieved successfully',
+    return BaseResponseDto.success(
       resourceSharing,
-      HttpStatus.OK,
+      'Resource sharing retrieved successfully',
     );
   }
 }

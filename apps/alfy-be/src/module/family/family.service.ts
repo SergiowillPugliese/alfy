@@ -75,8 +75,8 @@ export class FamilyService {
     return await familyMember.save();
   }
 
-  async getFamilyMembers(familyId: string, includeInactive: boolean = false): Promise<FamilyMemberDocument[]> {
-    const query: any = { familyId: new Types.ObjectId(familyId) };
+  async getFamilyMembers(familyId: string, includeInactive = false): Promise<FamilyMemberDocument[]> {
+    const query: { familyId: Types.ObjectId; isActive?: boolean } = { familyId: new Types.ObjectId(familyId) };
     if (!includeInactive) {
       query.isActive = true;
     }
@@ -95,6 +95,15 @@ export class FamilyService {
       })
       .populate('familyId', 'name description')
       .exec();
+  }
+
+  async getUserFamilyId(userId: string): Promise<string | null> {
+    const membership = await this.familyMemberModel.findOne({
+      userId: new Types.ObjectId(userId),
+      isActive: true,
+    });
+
+    return membership ? membership.familyId.toString() : null;
   }
 
   async getUserRoleInFamily(userId: string, familyId: string): Promise<UserRole | null> {

@@ -47,6 +47,7 @@ export class ResourceSharing {
     enum: SharingLevel,
   })
   @Prop({ 
+    type: String,
     required: true, 
     enum: Object.values(SharingLevel),
     default: SharingLevel.PRIVATE 

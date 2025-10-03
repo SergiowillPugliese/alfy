@@ -1,6 +1,7 @@
 import { 
   Controller, 
   Post, 
+  Put,
   Body, 
   UseGuards, 
   Request,
@@ -10,30 +11,18 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/create-auth.dto';
+import { LoginDto, RefreshTokenDto } from './dto/create-auth.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { AuthResponseDto, UserProfileResponseDto, LogoutResponseDto } from './dto/auth-response.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { BaseResponseDto } from '../../common/dto/baseResponce.dto';
 
-@ApiTags('Authentication')
+@ApiTags('Authentication (Login Only)')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'User successfully registered',
-    type: AuthResponseDto 
-  })
-  @ApiResponse({ status: 409, description: 'User already exists' })
-  @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
-  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const authData = await this.authService.register(registerDto);
-    return BaseResponseDto.success(authData, 'User successfully registered');
-  }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -80,6 +69,39 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Put('change-password')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ 
+    summary: 'Change user password',
+    description: 'Change password from temporary to secure password. Required for users with isPasswordReset=false.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Password changed successfully',
+    type: BaseResponseDto 
+  })
+  @ApiResponse({ 
+    status: 401, 
+    description: 'Current password is incorrect' 
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'New password does not meet security requirements' 
+  })
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto, @Request() req: { user: { sub: string } }) {
+    await this.authService.changePassword(
+      req.user.sub,
+      changePasswordDto.oldPassword,
+      changePasswordDto.newPassword,
+    );
+
+    return BaseResponseDto.success(
+      null,
+      'Password changed successfully. Please login again with your new password.',
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get current user profile' })
@@ -99,6 +121,8 @@ export class AuthController {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      globalRole: user.globalRole,
+      isPasswordReset: user.isPasswordReset,
       createdAt: user.createdAt || new Date(),
       updatedAt: user.updatedAt || new Date(),
     };

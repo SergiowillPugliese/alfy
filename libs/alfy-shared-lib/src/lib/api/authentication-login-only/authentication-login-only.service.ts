@@ -20,10 +20,11 @@ import { Observable } from 'rxjs';
 
 import type {
   AuthResponseDto,
+  BaseResponseDto,
+  ChangePasswordDto,
   LoginDto,
   LogoutResponseDto,
   RefreshTokenDto,
-  RegisterDto,
   UserProfileResponseDto,
 } from '../alfyAPI.schemas';
 
@@ -50,29 +51,8 @@ type HttpClientOptions = {
 };
 
 @Injectable({ providedIn: 'root' })
-export class AuthenticationService {
+export class AuthenticationLoginOnlyService {
   constructor(private http: HttpClient) {}
-  /**
-   * @summary Register a new user
-   */
-  authControllerRegister<TData = AuthResponseDto>(
-    registerDto: RegisterDto,
-    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
-  ): Observable<TData>;
-  authControllerRegister<TData = AuthResponseDto>(
-    registerDto: RegisterDto,
-    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
-  ): Observable<AngularHttpResponse<TData>>;
-  authControllerRegister<TData = AuthResponseDto>(
-    registerDto: RegisterDto,
-    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
-  ): Observable<HttpEvent<TData>>;
-  authControllerRegister<TData = AuthResponseDto>(
-    registerDto: RegisterDto,
-    options?: HttpClientOptions
-  ): Observable<TData> {
-    return this.http.post<TData>(`/api/auth/register`, registerDto, options);
-  }
   /**
    * @summary Login user
    */
@@ -133,6 +113,32 @@ export class AuthenticationService {
     return this.http.post<TData>(`/api/auth/logout`, undefined, options);
   }
   /**
+   * Change password from temporary to secure password. Required for users with isPasswordReset=false.
+   * @summary Change user password
+   */
+  authControllerChangePassword<TData = BaseResponseDto>(
+    changePasswordDto: ChangePasswordDto,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
+  ): Observable<TData>;
+  authControllerChangePassword<TData = BaseResponseDto>(
+    changePasswordDto: ChangePasswordDto,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
+  ): Observable<AngularHttpResponse<TData>>;
+  authControllerChangePassword<TData = BaseResponseDto>(
+    changePasswordDto: ChangePasswordDto,
+    options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
+  ): Observable<HttpEvent<TData>>;
+  authControllerChangePassword<TData = BaseResponseDto>(
+    changePasswordDto: ChangePasswordDto,
+    options?: HttpClientOptions
+  ): Observable<TData> {
+    return this.http.put<TData>(
+      `/api/auth/change-password`,
+      changePasswordDto,
+      options
+    );
+  }
+  /**
    * @summary Get current user profile
    */
   authControllerGetProfile<TData = UserProfileResponseDto>(
@@ -151,10 +157,11 @@ export class AuthenticationService {
   }
 }
 
-export type AuthControllerRegisterClientResult = NonNullable<AuthResponseDto>;
 export type AuthControllerLoginClientResult = NonNullable<AuthResponseDto>;
 export type AuthControllerRefreshTokensClientResult =
   NonNullable<AuthResponseDto>;
 export type AuthControllerLogoutClientResult = NonNullable<LogoutResponseDto>;
+export type AuthControllerChangePasswordClientResult =
+  NonNullable<BaseResponseDto>;
 export type AuthControllerGetProfileClientResult =
   NonNullable<UserProfileResponseDto>;

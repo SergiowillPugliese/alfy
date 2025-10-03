@@ -22,6 +22,7 @@ import type {
   CreateShoppingListDTO,
   DeleteResponseDto,
   ShoppingListArrayResponseDto,
+  ShoppingListControllerCreateParams,
   ShoppingListResponseDto,
   UpdateShoppingListDto,
   UpdateShoppingListItemDto,
@@ -57,25 +58,28 @@ export class ShoppingListService {
    */
   shoppingListControllerCreate<TData = ShoppingListResponseDto>(
     createShoppingListDTO: CreateShoppingListDTO,
+    params: ShoppingListControllerCreateParams,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'body' }
   ): Observable<TData>;
   shoppingListControllerCreate<TData = ShoppingListResponseDto>(
     createShoppingListDTO: CreateShoppingListDTO,
+    params: ShoppingListControllerCreateParams,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'response' }
   ): Observable<AngularHttpResponse<TData>>;
   shoppingListControllerCreate<TData = ShoppingListResponseDto>(
     createShoppingListDTO: CreateShoppingListDTO,
+    params: ShoppingListControllerCreateParams,
     options?: Omit<HttpClientOptions, 'observe'> & { observe?: 'events' }
   ): Observable<HttpEvent<TData>>;
   shoppingListControllerCreate<TData = ShoppingListResponseDto>(
     createShoppingListDTO: CreateShoppingListDTO,
+    params: ShoppingListControllerCreateParams,
     options?: HttpClientOptions
   ): Observable<TData> {
-    return this.http.post<TData>(
-      `/api/shopping-list`,
-      createShoppingListDTO,
-      options
-    );
+    return this.http.post<TData>(`/api/shopping-list`, createShoppingListDTO, {
+      ...options,
+      params: { ...params, ...options?.params },
+    });
   }
   /**
    * @summary Get all shopping lists

@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError, timer } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { AuthenticationService } from '../../api/authentication/authentication.service';
+import { AuthenticationLoginOnlyService } from '../../api/authentication-login-only/authentication-login-only.service';
 import { 
   AuthResponseDto, 
   LoginDto, 
-  RegisterDto, 
   RefreshTokenDto,
   UserProfileDto 
 } from '../../api/alfyAPI.schemas';
@@ -37,7 +36,7 @@ export class AuthStateService {
   public authState$ = this.authStateSubject.asObservable();
   private refreshTimer: any;
 
-  constructor(private authService: AuthenticationService) {
+  constructor(private authService: AuthenticationLoginOnlyService) {
     this.initializeAuthState();
   }
 
@@ -63,25 +62,11 @@ export class AuthStateService {
     }
   }
 
-  register(registerData: RegisterDto): Observable<AuthResponseDto> {
-    this.setLoading(true);
-    return this.authService.authControllerRegister(registerData).pipe(
-      tap(response => {
-        if (response.success && response.data) {
-          this.handleAuthSuccess(response.data);
-        }
-      }),
-      catchError(error => {
-        this.setLoading(false);
-        return throwError(() => error);
-      })
-    );
-  }
 
   login(loginData: LoginDto): Observable<AuthResponseDto> {
     this.setLoading(true);
     return this.authService.authControllerLogin(loginData).pipe(
-      tap(response => {
+      tap((response: any) => {
         if (response.success && response.data) {
           this.handleAuthSuccess(response.data);
         }
@@ -128,7 +113,7 @@ export class AuthStateService {
     };
 
     return this.authService.authControllerRefreshTokens(refreshData).pipe(
-      tap(response => {
+      tap((response: any) => {
         if (response.success && response.data) {
           this.handleAuthSuccess(response.data);
         }
@@ -142,7 +127,7 @@ export class AuthStateService {
 
   getProfile(): Observable<UserProfileDto | null> {
     return this.authService.authControllerGetProfile().pipe(
-      map(response => {
+      map((response: any) => {
         if (response.success && response.data) {
           // Update user in state
           const currentState = this.authStateSubject.value;

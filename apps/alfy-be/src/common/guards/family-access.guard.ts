@@ -40,16 +40,22 @@ export class FamilyAdminGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const familyId = request.params.familyId;
 
-    if (!familyId) {
-      throw new ForbiddenException('Family ID is required');
+    if (!user) {
+      throw new ForbiddenException('Access denied: authentication required');
     }
 
-    const userRole = await this.familyService.getUserRoleInFamily(user.sub, familyId);
-    if (userRole !== UserRole.ADMIN) {
-      throw new ForbiddenException('Access denied: admin role required');
+    // Get user's family where they are admin
+    const adminMemberships = await this.familyService.getUserFamilies(user.sub);
+    const adminFamily = adminMemberships.find(membership => membership.role === UserRole.ADMIN);
+
+    if (!adminFamily) {
+      throw new ForbiddenException('Access denied: admin role required in a family');
     }
+
+    // Add admin's family info to request for use in controllers
+    request.adminFamilyId = adminFamily.familyId.toString();
+    request.userFamilyRole = UserRole.ADMIN;
 
     return true;
   }
@@ -57,14 +63,14 @@ export class FamilyAdminGuard implements CanActivate {
 
 @Injectable()
 export class SysAdminGuard implements CanActivate {
-  constructor() {}
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    // This would need to be implemented to check global role
-    // For now, we'll assume it's checked elsewhere
+    if (!user) {
+      throw new ForbiddenException('Access denied: authentication required');
+    }
+
     if (user.globalRole !== UserRole.SYSADMIN) {
       throw new ForbiddenException('Access denied: sysadmin role required');
     }

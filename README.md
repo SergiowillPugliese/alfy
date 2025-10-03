@@ -18,14 +18,17 @@
 - 🔄 **TODO**: Categorizzazione automatica
 - 🔄 **TODO**: Integrazione con negozi online
 
-### 👥 **Gestione Multi-Utente & Famiglia** (Da Implementare)
-- **Profili Utente**: Ogni membro ha il suo profilo personalizzato
-- **Famiglia Condivisa**: Creazione/join di gruppi familiari
-- **Permessi Granulari**: 
-  - Contenuti personali (solo utente)
-  - Contenuti familiari (tutti i membri)
-  - Ruoli admin/membro
-- **Dashboard Personalizzate**: Vista filtrata per ogni utente
+### 👥 **Gestione Multi-Utente & Famiglia** (✅ Implementato)
+- ✅ **Sistema Ruoli Completo**: SYSADMIN, ADMIN, USER con permessi granulari
+- ✅ **Famiglie Isolate**: Ogni famiglia completamente separata dalle altre
+- ✅ **Bootstrap Sicuro**: Inizializzazione sistema con primo sysadmin
+- ✅ **Onboarding Chiuso**: Solo sysadmin/admin possono creare nuovi utenti
+- ✅ **Password Temporanee**: Sistema sicuro con reset obbligatorio
+- ✅ **Dashboard Ruoli**: 
+  - **Sysadmin Dashboard**: Gestione completa famiglie e utenti
+  - **Admin Dashboard**: Gestione membri della propria famiglia
+  - **User Dashboard**: Gestione risorse personali con condivisione
+- ✅ **Controlli Accesso Multi-Livello**: 6 guard di sicurezza implementati
 
 ### 📅 **Calendar & Appuntamenti** (Da Implementare)
 - **Appuntamenti Personali**: Medico, lavoro, hobby
@@ -250,14 +253,22 @@ alfy/
 - **Esposizione**: Moduli e route esportati via Module Federation
 
 #### **alfy-be (Backend API)**
-- **Ruolo**: API REST per tutti i servizi con AI Intelligence integrata
-- **Architettura**: NestJS con moduli per dominio (shopping-list, expenses, savings-goals, etc.)
-- **Features**: CRUD operations, validazione, documentazione OpenAPI
-- **AI Modules**: 
-  - Smart Expense Classification (spese fisse vs ottimizzabili)
-  - Emergency Management System (gestione imprevisti)
-  - AI Coach Personality Engine (consigli personalizzati)
-  - Predictive Analytics (forecasting e pattern recognition)
+- **Ruolo**: API REST per tutti i servizi con sistema ruoli e famiglie completo
+- **Architettura**: NestJS con moduli per dominio (auth, family, sysadmin, admin, shopping-list, etc.)
+- **Features**: CRUD operations, validazione, documentazione OpenAPI, sistema sicurezza multi-livello
+- **Security Modules**: 
+  - **Bootstrap System**: Inizializzazione sicura primo sysadmin
+  - **JWT Authentication**: Token-based auth con refresh
+  - **Role-Based Access Control**: 6 guard di sicurezza
+  - **Family Isolation**: Isolamento completo tra famiglie
+  - **Password Security**: Sistema password temporanee con validazioni
+- **API Endpoints**: 
+  - **Bootstrap**: `POST /bootstrap/sysadmin` (one-time)
+  - **Auth**: Login, logout, refresh, change-password, profile
+  - **Sysadmin**: 9 endpoint per gestione completa sistema
+  - **Admin**: 5 endpoint per gestione famiglia
+  - **Family**: Gestione membri e condivisione risorse
+  - **Shopping-List**: CRUD con controlli famiglia integrati
 
 #### **alfy-shared-lib (Shared Library)**
 - **Ruolo**: Codice condiviso tra applicazioni
@@ -301,6 +312,23 @@ npm run generate:api      # Rigenera client da schema OpenAPI
 
 # Visualizzazione dependency graph
 nx graph                  # Mostra grafo delle dipendenze
+
+# Sistema Ruoli e Famiglie
+# 1. Avvia il backend
+nx serve alfy-be
+
+# 2. Bootstrap del sistema (SOLO PRIMA VOLTA)
+curl -X POST http://localhost:3000/api/bootstrap/sysadmin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "pugliese.sergio87@gotmail.it",
+    "password": "AdminPassword123!",
+    "firstName": "Sergio",
+    "lastName": "Pugliese"
+  }'
+
+# 3. Accedi alla documentazione API
+# http://localhost:3000/api/docs
 ```
 
 ## 📱 User Experience
@@ -365,14 +393,17 @@ nx graph                  # Mostra grafo delle dipendenze
 - [x] Sistema build e development workflow
 - [x] Generazione automatica API client da OpenAPI
 
-### **Phase 1: Shopping Lists Core (✅ In Corso)**
+### **Phase 1: Shopping Lists & Multi-User System (✅ Completato)**
 - [x] CRUD shopping lists (Backend API)
 - [x] Interfaccia gestione liste (Frontend)
 - [x] Gestione articoli con unità di misura
-- [ ] Ottimizzazione UX e responsive design
-- [ ] Sistema autenticazione (JWT)
-- [ ] Gestione profili utente
-- [ ] Refactor per supporto multi-user
+- [x] **Sistema autenticazione completo (JWT)**
+- [x] **Gestione ruoli e famiglie**
+- [x] **Bootstrap sicuro sistema**
+- [x] **Dashboard multi-ruolo (Sysadmin, Admin, User)**
+- [x] **Controlli accesso e isolamento famiglie**
+- [x] **Password temporanee e sicurezza**
+- [x] **Sistema condivisione risorse granulare**
 
 ### **Phase 2: Calendar & Notifications (Q2 2024)**
 - [ ] Gestione appuntamenti personali/familiari
@@ -464,13 +495,21 @@ nx graph                  # Mostra grafo delle dipendenze
 ## 🛠️ Stato Attuale del Progetto
 
 **Architettura**: ✅ Nx Monorepo con Microfrontend  
-**Backend**: ✅ NestJS con moduli shopping-list  
+**Backend**: ✅ NestJS con sistema ruoli e famiglie completo  
 **Frontend**: ✅ Angular Shell + Microfrontend Shopping  
 **Shared Library**: ✅ API client e componenti comuni  
 **Development Workflow**: ✅ Completamente funzionante  
+**🔐 Security System**: ✅ **COMPLETATO** - Sistema ruoli, famiglie e sicurezza  
 **Smart Money Manager**: 🎯 **Prossimo Focus** - Microfrontend mfExpenses ready per sviluppo
 
-Il progetto ha migrato con successo da Ionic a un'architettura moderna basata su **Nx workspace** con **microfrontend Angular** e **backend NestJS**. La struttura attuale permette scalabilità, manutenibilità e sviluppo parallelo di features indipendenti.
+Il progetto ha implementato con successo un **sistema completo di gestione ruoli e famiglie** con:
+- ✅ **Bootstrap sicuro** con primo sysadmin
+- ✅ **3 ruoli** (SYSADMIN, ADMIN, USER) con permessi granulari  
+- ✅ **Isolamento famiglie** completo
+- ✅ **Dashboard specializzate** per ogni ruolo
+- ✅ **Sistema password temporanee** con reset obbligatorio
+- ✅ **6 guard di sicurezza** multi-livello
+- ✅ **20+ endpoint API** completamente documentati
 
 ### **🎮 Next: Smart Money Manager**
 Il prossimo step è implementare il **videogame delle finanze personali** con:

@@ -41,6 +41,7 @@ export class User {
     required: false,
   })
   @Prop({ 
+    type: String,
     required: false, 
     enum: Object.values(UserRole),
     default: null 
@@ -59,6 +60,13 @@ export class User {
   })
   @Prop({ default: true })
   isActive: boolean;
+
+  @ApiProperty({
+    description: 'Whether the user has reset their temporary password',
+    example: false,
+  })
+  @Prop({ default: false })
+  isPasswordReset: boolean;
 
   @ApiProperty({
     description: 'Creation timestamp',

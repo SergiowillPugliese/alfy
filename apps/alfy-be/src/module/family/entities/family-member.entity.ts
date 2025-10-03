@@ -33,6 +33,7 @@ export class FamilyMember {
     enum: UserRole,
   })
   @Prop({ 
+    type: String,
     required: true, 
     enum: Object.values(UserRole),
     default: UserRole.USER 

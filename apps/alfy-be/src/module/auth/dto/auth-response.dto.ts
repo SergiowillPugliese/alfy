@@ -21,6 +21,12 @@ export class UserProfileDto {
   })
   globalRole?: string;
 
+  @ApiProperty({ 
+    description: 'Whether the user has reset their temporary password',
+    example: false 
+  })
+  isPasswordReset: boolean;
+
   @ApiProperty({ description: 'User creation date' })
   createdAt: Date;
 

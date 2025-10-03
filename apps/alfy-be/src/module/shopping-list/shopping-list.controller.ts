@@ -22,13 +22,17 @@ import {
 } from './dto/shopping-list-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SharingLevel } from '../../common/enums/roles.enum';
+import { FamilyService } from '../family/family.service';
 
 @ApiTags('Shopping List')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('shopping-list')
 export class ShoppingListController {
-  constructor(private readonly shoppingListService: ShoppingListService) {}
+  constructor(
+    private readonly shoppingListService: ShoppingListService,
+    private readonly familyService: FamilyService,
+  ) {}
 
   @ApiOperation({ summary: 'Create a new shopping list' })
   @ApiResponse({
@@ -41,18 +45,23 @@ export class ShoppingListController {
     description: 'Bad request - Invalid input data',
   })
   @Post()
-  create(
+  async create(
     @Body() createShoppingListDto: CreateShoppingListDTO,
     @Request() req,
-    @Query('familyId') familyId: string,
     @Query('sharingLevel') sharingLevel?: SharingLevel,
     @Query('sharedWithUsers') sharedWithUsers?: string,
   ) {
+    // Get user's family automatically
+    const userFamilyId = await this.familyService.getUserFamilyId(req.user.sub);
+    if (!userFamilyId) {
+      throw new Error('User must belong to a family to create shopping lists');
+    }
+
     const sharedUsers = sharedWithUsers ? sharedWithUsers.split(',') : [];
     return this.shoppingListService.create(
       createShoppingListDto,
       req.user.sub,
-      familyId,
+      userFamilyId,
       sharingLevel || SharingLevel.PRIVATE,
       sharedUsers
     );
@@ -65,8 +74,14 @@ export class ShoppingListController {
     type: ShoppingListArrayResponseDto,
   })
   @Get()
-  findAll(@Request() req, @Query('familyId') familyId: string) {
-    return this.shoppingListService.findAll(req.user.sub, familyId);
+  async findAll(@Request() req) {
+    // Get user's family automatically
+    const userFamilyId = await this.familyService.getUserFamilyId(req.user.sub);
+    if (!userFamilyId) {
+      throw new Error('User must belong to a family to access shopping lists');
+    }
+
+    return this.shoppingListService.findAll(req.user.sub, userFamilyId);
   }
 
   @ApiOperation({ summary: 'Get a shopping list by id' })
@@ -80,7 +95,7 @@ export class ShoppingListController {
     description: 'Shopping list not found',
   })
   @Get(':id')
-  findOne(@Param('id') id: string, @Request() req) {
+  async findOne(@Param('id') id: string, @Request() req) {
     return this.shoppingListService.findOne(id, req.user.sub);
   }
 
@@ -99,7 +114,7 @@ export class ShoppingListController {
     description: 'Bad request - Invalid input data',
   })
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateShoppingListDto: UpdateShoppingListDto,
     @Request() req,
@@ -122,7 +137,7 @@ export class ShoppingListController {
     description: 'Bad request - Invalid input data',
   })
   @Patch(':id/items/:itemId')
-  updateItem(
+  async updateItem(
     @Param('id') id: string,
     @Param('itemId') itemId: string,
     @Body() updateItemDto: UpdateShoppingListItemDto,
@@ -142,7 +157,7 @@ export class ShoppingListController {
     description: 'Shopping list not found',
   })
   @Delete(':id')
-  remove(@Param('id') id: string, @Request() req) {
+  async remove(@Param('id') id: string, @Request() req) {
     return this.shoppingListService.remove(id, req.user.sub);
   }
 
@@ -157,7 +172,7 @@ export class ShoppingListController {
     description: 'Shopping list or item not found',
   })
   @Delete(':id/items/:itemId')
-  removeItem(@Param('id') id: string, @Param('itemId') itemId: string, @Request() req) {
+  async removeItem(@Param('id') id: string, @Param('itemId') itemId: string, @Request() req) {
     return this.shoppingListService.removeItem(id, itemId, req.user.sub);
   }
 }

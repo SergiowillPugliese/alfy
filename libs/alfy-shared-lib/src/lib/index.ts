@@ -6,7 +6,11 @@ export * from './types/auth.types';
 // Export dei servizi API generati da orval
 export * from './api/shopping-list/shopping-list.service';
 export * from './api/app/app.service';
-export * from './api/authentication/authentication.service';
+export * from './api/authentication-login-only/authentication-login-only.service';
+export * from './api/bootstrap/bootstrap.service';
+export * from './api/sysadmin-dashboard/sysadmin-dashboard.service';
+export * from './api/admin-dashboard/admin-dashboard.service';
+export * from './api/family-management-internal/family-management-internal.service';
 export * from './api/alfyAPI.schemas';
 
 // Export servizi toast

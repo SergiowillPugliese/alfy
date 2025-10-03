@@ -5,12 +5,39 @@
  * The Alfy API documentation
  * OpenAPI spec version: 1.0
  */
-export interface RegisterDto {
+export interface BootstrapSysadminDto {
+  /** Email for the sysadmin account */
   email: string;
-  /** @minLength 6 */
+  /**
+   * Password for the sysadmin account
+   * @minLength 8
+   */
   password: string;
+  /** First name of the sysadmin */
   firstName: string;
+  /** Last name of the sysadmin */
   lastName: string;
+}
+
+/**
+ * The actual data payload
+ */
+export type BaseResponseDtoData = { [key: string]: unknown };
+
+export interface BaseResponseDto {
+  /** Indicates if the request was successful */
+  success: boolean;
+  /** Optional message describing the result */
+  message?: string;
+  /** The actual data payload */
+  data?: BaseResponseDtoData;
+  /** Error message if request failed */
+  error?: string;
+}
+
+export interface LoginDto {
+  email: string;
+  password: string;
 }
 
 export interface UserProfileDto {
@@ -22,6 +49,10 @@ export interface UserProfileDto {
   firstName: string;
   /** User last name */
   lastName: string;
+  /** User global role (only for sysadmin) */
+  globalRole?: string;
+  /** Whether the user has reset their temporary password */
+  isPasswordReset: boolean;
   /** User creation date */
   createdAt: string;
   /** User last update date */
@@ -48,11 +79,6 @@ export interface AuthResponseDto {
   error?: string;
 }
 
-export interface LoginDto {
-  email: string;
-  password: string;
-}
-
 export interface RefreshTokenDto {
   refresh_token: string;
 }
@@ -73,6 +99,16 @@ export interface LogoutResponseDto {
   error?: string;
 }
 
+export interface ChangePasswordDto {
+  /** Current password (temporary or existing) */
+  oldPassword: string;
+  /**
+   * New password - must contain uppercase, lowercase, number and special character
+   * @minLength 8
+   */
+  newPassword: string;
+}
+
 export interface UserProfileResponseDto {
   /** Indicates if the request was successful */
   success: boolean;
@@ -82,6 +118,124 @@ export interface UserProfileResponseDto {
   data?: UserProfileDto;
   /** Error message if request failed */
   error?: string;
+}
+
+export interface AddFamilyMemberDto {
+  /** The email of the user to add to the family */
+  email: string;
+}
+
+/**
+ * The sharing level for the resource
+ */
+export type UpdateSharingDtoSharingLevel =
+  (typeof UpdateSharingDtoSharingLevel)[keyof typeof UpdateSharingDtoSharingLevel];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateSharingDtoSharingLevel = {
+  private: 'private',
+  family: 'family',
+  selected_members: 'selected_members',
+} as const;
+
+export interface UpdateSharingDto {
+  /** The sharing level for the resource */
+  sharingLevel: UpdateSharingDtoSharingLevel;
+  /** Array of user IDs to share with (only used when sharingLevel is selected_members) */
+  sharedWithUsers?: string[];
+}
+
+export interface CreateFamilyDto {
+  /**
+   * The name of the family
+   * @maxLength 100
+   */
+  name: string;
+  /**
+   * The description of the family
+   * @maxLength 500
+   */
+  description?: string;
+}
+
+export interface UpdateFamilyDto {
+  /**
+   * The name of the family
+   * @maxLength 100
+   */
+  name?: string;
+  /**
+   * The description of the family
+   * @maxLength 500
+   */
+  description?: string;
+}
+
+export interface ChangeFamilyAdminDto {
+  /** User ID of the new admin */
+  newAdminId: string;
+}
+
+/**
+ * Role for the new user
+ */
+export type CreateUserDtoRole =
+  (typeof CreateUserDtoRole)[keyof typeof CreateUserDtoRole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateUserDtoRole = {
+  admin: 'admin',
+  user: 'user',
+} as const;
+
+/**
+ * Whether to use existing family or create new one
+ */
+export type CreateUserDtoFamilyAction =
+  (typeof CreateUserDtoFamilyAction)[keyof typeof CreateUserDtoFamilyAction];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateUserDtoFamilyAction = {
+  existing: 'existing',
+  new: 'new',
+} as const;
+
+export interface CreateUserDto {
+  /** Email for the new user */
+  email: string;
+  /** First name of the user */
+  firstName: string;
+  /** Last name of the user */
+  lastName: string;
+  /** Role for the new user */
+  role: CreateUserDtoRole;
+  /** Whether to use existing family or create new one */
+  familyAction: CreateUserDtoFamilyAction;
+  /** Family ID if using existing family */
+  familyId?: string;
+  /** Family name if creating new family */
+  familyName?: string;
+  /** Family description if creating new family */
+  familyDescription?: string;
+}
+
+export interface UpdateUserStatusDto {
+  /** Whether the user should be active */
+  isActive: boolean;
+}
+
+export interface CreateFamilyMemberDto {
+  /** Email for the new family member */
+  email: string;
+  /** First name of the family member */
+  firstName: string;
+  /** Last name of the family member */
+  lastName: string;
+}
+
+export interface UpdateFamilyMemberStatusDto {
+  /** Whether the family member should be active */
+  isActive: boolean;
 }
 
 /**
@@ -121,6 +275,10 @@ export interface CreateShoppingListDTO {
   list: ShoppingListItemDTO[];
 }
 
+export interface ObjectId {
+  [key: string]: unknown;
+}
+
 /**
  * The unit of measurement for the item
  */
@@ -153,9 +311,13 @@ export interface ShoppingListItemEntity {
 
 export interface ShoppingList {
   /** The unique identifier of the shopping list */
-  _id: string;
+  _id: ObjectId;
   /** The name of the shopping list */
   name: string;
+  /** The ID of the user who created the shopping list */
+  ownerId: ObjectId;
+  /** The ID of the family this shopping list belongs to */
+  familyId: ObjectId;
   /** Whether the shopping list is completed */
   bought: boolean;
   /** The list of items in the shopping list */
@@ -238,3 +400,7 @@ export interface DeleteResponseDto {
   /** Error message if request failed */
   error?: string;
 }
+
+export type ShoppingListControllerCreateParams = {
+  sharedWithUsers: string;
+};

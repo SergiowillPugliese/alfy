@@ -22,6 +22,7 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   globalRole?: string;
+  isPasswordReset: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,6 +35,7 @@ export interface JwtPayload {
   sub: string;
   email: string;
   globalRole?: string;
+  isPasswordReset?: boolean;
   iat?: number;
   exp?: number;
 }

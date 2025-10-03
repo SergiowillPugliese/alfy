@@ -1,53 +1,21 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { User, UserDocument } from './entities/user.entity';
-import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/create-auth.dto';
+import { LoginDto, RefreshTokenDto } from './dto/create-auth.dto';
 import { AuthResponse, UserProfile, JwtPayload } from '@alfy/alfy-shared-lib';
 
 @Injectable()
 export class AuthService {
+  private readonly TEMP_PASSWORD = '4lf1M3mb3r';
+
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<AuthResponse> {
-    const { email, password, firstName, lastName, globalRole } = registerDto;
-
-    // Check if user already exists
-    const existingUser = await this.userModel.findOne({ email });
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Create user
-    const user = new this.userModel({
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
-      globalRole: globalRole || null, // Only set if provided (for sysadmin)
-    });
-
-    const savedUser = await user.save();
-    
-    // Generate tokens
-    const tokens = await this.generateTokens(savedUser);
-    
-    // Save refresh token
-    await this.updateRefreshToken(savedUser._id.toString(), tokens.refresh_token);
-
-    return {
-      ...tokens,
-      user: this.mapToUserProfile(savedUser),
-    };
-  }
 
   async login(loginDto: LoginDto): Promise<AuthResponse> {
     const user = await this.validateUser(loginDto.email, loginDto.password);
@@ -112,11 +80,37 @@ export class AuthService {
     await this.userModel.findByIdAndUpdate(userId, { refreshToken: null });
   }
 
+  async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<UserDocument> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    // Verify old password
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isOldPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update password and mark as reset
+    user.password = hashedNewPassword;
+    user.isPasswordReset = true;
+
+    // Clear refresh token to force re-login with new password
+    user.refreshToken = null;
+
+    return await user.save();
+  }
+
   private async generateTokens(user: UserDocument) {
     const payload: JwtPayload = {
       sub: user._id.toString(),
       email: user.email,
       globalRole: user.globalRole,
+      isPasswordReset: user.isPasswordReset,
     };
 
     const [access_token, refresh_token] = await Promise.all([
@@ -147,8 +141,47 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       globalRole: user.globalRole || undefined,
+      isPasswordReset: user.isPasswordReset,
       createdAt: user.createdAt || new Date(),
       updatedAt: user.updatedAt || new Date(),
     };
+  }
+
+  /**
+   * Create a user with temporary password (for sysadmin/admin use)
+   */
+  async createUserWithTempPassword(userData: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    globalRole?: string;
+  }): Promise<UserDocument> {
+    // Check if user already exists
+    const existingUser = await this.userModel.findOne({ email: userData.email });
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    // Hash temporary password
+    const hashedPassword = await bcrypt.hash(this.TEMP_PASSWORD, 12);
+
+    // Create user with temporary password
+    const user = new this.userModel({
+      email: userData.email,
+      password: hashedPassword,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      globalRole: userData.globalRole || null,
+      isPasswordReset: false, // User must reset password on first login
+    });
+
+    return await user.save();
+  }
+
+  /**
+   * Get temporary password (for display purposes)
+   */
+  getTempPassword(): string {
+    return this.TEMP_PASSWORD;
   }
 }
